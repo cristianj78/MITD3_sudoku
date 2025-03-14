@@ -9,11 +9,14 @@ racine.geometry("1080x800")
 racine.title("sudoku")
 
 #Boites contenant les différents choix
-def sauvegarder(sudoku): #Utilsation de JSON
-    with open("sauvegardes.json", "w") as fichier:
+def ajouter_sauvegarde(sudoku): #Utilsation de JSON
+    with open("sauvegardes.json", "a") as fichier:
         json.dump(sudoku, fichier) 
 
-def chargement(sudoku):
+def sauvegarder(grille_sans_vide, grille):
+    ajouter_sauvegarde(grille_sans_vide)
+
+def chargement(fichier):
     with open("sauvegardes.json", "r") as fichier:
         json.load(fichier)
 
@@ -35,7 +38,7 @@ def remplir_grille(grille):
     for ligne in range(9):
         for col in range(9):
             if grille[ligne][col] == 0:
-                for num in sample(range(1, 10), 9):  # Mélange des nombres
+                for num in sample(range(1, 10), 9):  # Mélange des nombres (Pas de shuffle, ça renverrait None)
                     if est_valide(grille, ligne, col, num):
                         grille[ligne][col] = num
                         if remplir_grille(grille): #appel récursif, tant que la grille n'est pas valide.
@@ -50,12 +53,11 @@ def generer_sudoku(): #Position = Dans quel canva
     return grille
 
 def creer_cases_vides(grille, nb_cases=40):
-
     cases = [(i, j) for i in range(9) for j in range(9)]
     shuffle(cases) #mélange les élements de la liste
     for i in range(nb_cases):
         ligne, col = cases.pop()
-        grille[ligne][col] = 0                              #On sépare les deux fonctions par souci de sauvegarde
+        grille[ligne][col] = 0   #On sépare les deux fonctions par souci de sauvegarde
     return grille
 
 def dessiner_sudoku(sudoku, position, hauteur, police):
@@ -94,16 +96,19 @@ def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Chois
         jeu.destroy()
         boite_information.destroy()
         text.destroy()
+        Victoire_boite = Frame(Choisi)
+        Victoire_boite.pack()
+
         
 
-def click_case(event, grille_sans_vide, grille, jeu, position):
+def cliquer_case(event, grille_sans_vide, grille, jeu, position):
     trouvé = False
     i, j = -1, -1
     for x in range(9):
         for y in range(9):
             if (x * 55) <= event.x < ((x + 1) * 55) and (y * 55) <= event.y < ((y + 1) * 55):
                 j, i, = x, y
-                print(f"c'est la case {i+1} {j+1}")
+                print(f"c'est la case {i+1} {j+1}") #test
                 trouvé = True
                 break
         if trouvé:
@@ -129,7 +134,7 @@ def nouveau_jeu(grille_sans_vide, i, grille):
 
     menu = Menu(Choisi)
     Ouvrir = menu.add_command(label="Ouvrir")
-    Sauvegarder = menu.add_command(label="Sauvegarder")
+    Sauvegarder = menu.add_command(label="Sauvegarder", command=lambda:sauvegarder(grille_sans_vide, grille))
     Quitter = menu.add_command(label="Quitter", command=Choisi.destroy)
     menu.add_separator()
 
@@ -141,7 +146,7 @@ def nouveau_jeu(grille_sans_vide, i, grille):
     jeu.grid(row=0)
     construire_sudoku(jeu, 500)
     dessiner_sudoku(grille, jeu, 500, 25)
-    jeu.bind("<Button-1>", lambda event :click_case(event, grille_sans_vide, grille, jeu, Choisi))
+    jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_sans_vide, grille, jeu, Choisi))
     
 
 
@@ -187,6 +192,5 @@ Difficile = Button(boite_widget, text="Difficile", command=lambda:choix_modele(6
 Difficile.grid(row=1, column=2)
 test = Button(boite_widget, text="test", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3, bg="#ded26f")
 test.grid(row=1, column=3)
-
 
 racine.mainloop()
