@@ -52,12 +52,14 @@ def generer_sudoku(): #Position = Dans quel canva
     remplir_grille(grille)
     return grille
 
+#On sépare les deux fonctions par souci de sauvegarde
+
 def creer_cases_vides(grille, nb_cases=40):
     cases = [(i, j) for i in range(9) for j in range(9)]
-    shuffle(cases) #mélange les élements de la liste
+    shuffle(cases) #mélange les cordonnés des élements de la liste
     for i in range(nb_cases):
         ligne, col = cases.pop()
-        grille[ligne][col] = 0   #On sépare les deux fonctions par souci de sauvegarde
+        grille[ligne][col] = 0   
     return grille
 
 def dessiner_sudoku(sudoku, position, hauteur, police):
@@ -96,9 +98,8 @@ def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Chois
         jeu.destroy()
         boite_information.destroy()
         text.destroy()
-        Victoire_boite = Frame(Choisi)
-        Victoire_boite.pack()
-
+        Victoire = Label(Choisi, text = "Bravo, vous avez gagné !").grid(row=5, column=1)
+        Retour = Button(Choisi, text = "Revenir à la sélection des modèles", command=Choisi.destroy).grid(row=4, column=1)
         
 
 def cliquer_case(event, grille_sans_vide, grille, jeu, position):
@@ -147,7 +148,6 @@ def nouveau_jeu(grille_sans_vide, i, grille):
     construire_sudoku(jeu, 500)
     dessiner_sudoku(grille, jeu, 500, 25)
     jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_sans_vide, grille, jeu, Choisi))
-    
 
 
 def choix_modele(Niveau):
