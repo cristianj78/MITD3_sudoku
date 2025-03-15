@@ -14,6 +14,7 @@ Json : pour implanter le système de sauvegarde des modèles de sudoku.
 En éxecutant le programme, une fenêtre s'ouvre vous proposant de choisir le niveau de difficulté, ces niveaux se basent 
 sur le nombre de cases vides dans la grille (Facile : 40, Moyen : 50, Difficile : 60). 
 Vous pouvez d'ailleurs modifier ces nombres de cases vides, en ajustant le nombre associé à l'appel de la fonction choix_modele pour chacun des boutons aux lignes (187, 189, 191) 
+(Notez qu'il n'est pas possible d'aller au-delà de 60 cases vides, plusieurs solutions seraient alors possibles et le sudoku serait alors impossible à résoudre.)
 Après avoir choisi la difficulté, une panoplie de puzzle au nombre de 6 vous est proposé, vous avez la possibilité de relancer une partie 
 sauvegardée, que vous ayez déjà terminé un modèle où que vous ayez envie d'en continuer un autre.
 Vous avez également la possibilté de jouer plusieurs modèles simultanément, de revenir au choix des modèles.
