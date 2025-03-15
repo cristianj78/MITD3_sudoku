@@ -5,8 +5,11 @@ Ce document explique l'utilisation du code contenu dans le fichier "main.py" :
 On fait intervenir plusieurs modules dans ce programme:
 
 Tkinter : pour réaliser une interface graphique où apparaitra le sudoku.
+
 Random : pour remplir les grilles de sudoku de façon aléatoire.
+
 Copy : utilisé car nous devons réaliser des copies de liste contenant des sous listes (même cas pour n'importe quel objet)
+
 Json : pour implanter le système de sauvegarde des modèles de sudoku.
 
 2 : Que fait le programme ? 
