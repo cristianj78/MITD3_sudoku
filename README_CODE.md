@@ -2,10 +2,13 @@ Ce README explique le code contenu dans le fichier "main.py":
 
 1 : Les modules 
 
-1: Tkinter : Afin de pouvoir réaliser les interfaces graphique pour y instaurer le jeu du Sudoku
-2 : Random : Pour générer les grilles de Sudoku de façon aléatoire
-3 : copy : Car on est en présence de liste de sous-listes (même cas pour les objets)
-4 : json : Pour implanter le système de sauvegarde des modèles
+Tkinter : Afin de pouvoir réaliser les interfaces graphique pour y instaurer le jeu du Sudoku
+
+Random : Pour générer les grilles de Sudoku de façon aléatoire
+
+Copy : Car on est en présence de liste de sous-listes (même cas pour les objets)
+
+Json : Pour implanter le système de sauvegarde des modèles
 
 2 : Que fait le programme ?
 
