@@ -8,6 +8,10 @@ racine.config(bg="#51aeb0")
 racine.geometry("1080x800")
 racine.title("sudoku")
 
+def effacer_widget(fenetre):
+    for widget in fenetre.winfo_children():
+        widget.destroy()
+
 #Boites contenant les différents choix
 def ajouter_sauvegarde(sudoku): #Utilsation de JSON
     with open("sauvegardes.json", "a") as fichier:
@@ -95,11 +99,9 @@ def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Chois
         if grille[i][j] == 0:
             jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1)-2, fill="red")    
     if grille_sans_vide == grille:
-        jeu.destroy()
-        boite_information.destroy()
-        text.destroy()
-        Victoire = Label(Choisi, text = "Bravo, vous avez gagné !").grid(row=5, column=1)
-        Retour = Button(Choisi, text = "Revenir à la sélection des modèles", command=Choisi.destroy).grid(row=4, column=1)
+        effacer_widget(Choisi)
+        Victoire = Label(Choisi, text = "Bravo, vous avez gagné !", font=("Arial",25)).pack(expand=YES)
+        Retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, command=Choisi.destroy).pack(expand=YES)
         
 
 def cliquer_case(event, grille_sans_vide, grille, jeu, position):
@@ -120,18 +122,23 @@ def cliquer_case(event, grille_sans_vide, grille, jeu, position):
     print(i+1, j+1) 
     print(grille[i][j])
     if grille[i][j] == 0:
-        Choix_numero = Label(position, text=f"Choisissez un numéro pour ({i+1}, {j+1})") #On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
+        Choix_numero = Label(position, text=f"Choisissez un numéro pour ({i+1}, {j+1})", bg="#51aeb0") #On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
         Choix_numero.grid(row=5, column=0) 
         for k in range(1, 10):
-            Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_sans_vide, grille, Boite_information, position, i, j, jeu, Choix_numero), width=5, height=2)
+            Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_sans_vide, grille, Boite_information, position, i, j, jeu, Choix_numero), width=5, height=2, bg="#ded26f")
             Numero.grid(row=2, column=k-1)
 
 liste_boutons = []
+def regenerer_sudoku(niveau, fenetre):
+    effacer_widget(fenetre)
+    choix_modele(niveau)
+    
 def nouveau_jeu(grille_sans_vide, i, grille):
     Choisi = Toplevel(racine)
     Choisi.resizable(False, False)
     Choisi.geometry("500x600")
     Choisi.title(f"Modèle {i}")
+    Choisi.config(bg="#51aeb0")
 
     menu = Menu(Choisi)
     Ouvrir = menu.add_command(label="Ouvrir")
@@ -151,12 +158,18 @@ def nouveau_jeu(grille_sans_vide, i, grille):
 
 
 def choix_modele(Niveau):
-    Sasuvegardes = Button(racine, text="Ouvrir une sauvegarde", command=sauvegarder)
-    Sasuvegardes.pack(side=TOP)
+    effacer_widget(racine)
+    Boite_bouton = Frame(racine)
+    Boite_bouton.pack()
+    Texte_modele = Label(racine, text="Choisir le modèle",  bg="#51aeb0", font=("Times", 35, "bold"))
+    Texte_modele.pack(side=TOP)
+    Sasuvegardes = Button(Boite_bouton, text="Ouvrir une sauvegarde", command=sauvegarder)
+    Sasuvegardes.pack(expand=YES, side=RIGHT)
+    regeneration = Button(Boite_bouton, text="Regénérer les modèles", command=lambda:regenerer_sudoku(Niveau, racine))
+    regeneration.pack(expand=YES, side=TOP)
+   
 
     racine.config(bg="#51aeb0")
-    global difficulte
-    difficulte.config(text="Choisssez le modèle", bg="#51aeb0", font=("Times", 35, "bold"))
     boite_widget.destroy()
     Choix = Frame(racine, bg="#51aeb0")
     Choix.pack()
