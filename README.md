@@ -1,4 +1,4 @@
-MI TD03:
+MI TD03 sudoku:
 
 -PACE-BAUCHET Raphaël, 22400401
 
@@ -6,7 +6,7 @@ MI TD03:
 
 -OKE Abdoul kader, 22401989
 
--
+-QUETU Nathan, 22404258
 
 URL de dépot du projet :
 
