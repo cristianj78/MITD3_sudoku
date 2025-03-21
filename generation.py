@@ -174,6 +174,10 @@ num_possible = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 num_possible_ephemere = {}
 
 def next_number(sudoku,a,b,c,d):
+<<<<<<< HEAD
+=======
+    """Change la valeur de la case parmi les nombres possible, retourne false si aucune sol n'est trouvé, sinon true"""
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
     global retour
     cle = (a, b, c, d)
     if not retour:
@@ -184,7 +188,10 @@ def next_number(sudoku,a,b,c,d):
         if sudoku[a][b][c][d] in num_possible_ephemere[cle]:
             num_possible_ephemere[cle].remove(sudoku[a][b][c][d])
         liste_possible_ephemere = num_possible_ephemere[cle]
+<<<<<<< HEAD
     # print(liste_possible_ephemere)
+=======
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
 
 
     for j in range(3):
@@ -201,7 +208,10 @@ def next_number(sudoku,a,b,c,d):
         for l in range(3):
             if sudoku[a][b][k][l] in liste_possible_ephemere:
                 liste_possible_ephemere.remove(sudoku[a][b][k][l])
+<<<<<<< HEAD
     # print(liste_possible_ephemere)
+=======
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
 
 
     num_possible_ephemere[cle] = liste_possible_ephemere
@@ -224,11 +234,18 @@ def next_number(sudoku,a,b,c,d):
 
 
 def sudoku_affichage():
+<<<<<<< HEAD
+=======
+    """Affiche le sudoku"""
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
     for i in range(3):
         for j in range(3):
             for k in range(3):
                 for l in range(3):
+<<<<<<< HEAD
                     # print("sudoku fini", sudoku[i][j][k][l])
+=======
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
                     print(sudoku[i][k][j][l], end=" ")
                 print(end="  ")
             print("")
@@ -240,10 +257,14 @@ while i < 3:
     while j < 3:
         while k < 3:
             while l < 3:
+<<<<<<< HEAD
                 # next_number(sudoku,i,k,j,l)
                 # print("sudoku fini", sudoku[i][j][k][l])
                 next = next_number(sudoku,i,j,k,l)
                 # sudoku_affichage()
+=======
+                next = next_number(sudoku,i,j,k,l)
+>>>>>>> 12a558fb00bf219b594928e7aa52e8e130551d4b
                 if next == False:
                     if l > 0:
                         l = l-1

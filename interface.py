@@ -88,7 +88,7 @@ creation_temps()
 def quitter_partie():
     fenetre_sudoku.destroy() # Ferme la fenetre principale
 button_quiter_partie.config(command=quitter_partie) # Appelle la fenetre pour quitter la partie
-fenetre_sudoku
+
 
 # Creation d'un bouton pour retourner en arriere
 def retour_arriere():
@@ -96,8 +96,12 @@ def retour_arriere():
 bouton_reture.config(command=retour_arriere) # Appelle la fonction pour retourner en arriere
 
 # Creation d'un bouton pour supprimer un chiffre
-def supprimer_chiffre():
-    pass 
+def supprimer_chiffre(bonton):
+    bontons.remove(bonton)
+    bonton.config(text=" ") # Supprimer le texte du bouton  
+bouton_supprime.config (command=supprimer_chiffre)
+
+    
 bouton_supprime.config(command=supprimer_chiffre) # Appelle la fonction pour supprimer un chiffre
 
 # Creation d'un bouton pour choisir le niveau facile 
@@ -123,6 +127,7 @@ bouton_expert.config(command=niveau_expert) # Appelle la fonction pour choisir l
 # Creation d'un bouton pour commencer une nouvelle partie
 def nouvelle_partie():
     bouton_nouvelle_partie = tk.Toplevel() # Creation d'une nouvelle fenetre
+
     
 
 
@@ -142,17 +147,6 @@ def placer(bonton,valeur_chiffre): # Fonction pour changer le texte d'un bouton
     print(button)
     bontons.append(bonton) # Ajouter la fontion placer das la liste des boutons choisies
     print (bontons)
-
-def supprimer(bonton):
-    bontons.pop(bonton)
-    bonton.config(text="") # Supprimer le texte du bouton
-    
-bouton_supprime.config (command=supprimer)
-print(bontons)
-    
-
-
-   
 
 
  
