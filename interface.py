@@ -146,8 +146,6 @@ def placer(bonton,valeur_chiffre): # Fonction pour changer le texte d'un bouton
     bonton.config(text=valeur_chiffre) # Change le texte du bouton par le chiffre selectionner 
     print(button)
     bontons.append(bonton) # Ajouter la fontion placer das la liste des boutons choisies
-    print (bontons)
-
 
  
 
