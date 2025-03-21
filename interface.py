@@ -52,15 +52,15 @@ for i in range(3):
         z += 1
 
 # Creation des grilles de sudoku
-button = 0
+button = None
 for t in range (3):
     for y in range(3):
         case = tk.Frame(cadre_sudoku, width=15, height=5, bg = "black", padx=1, pady=1)
-        case.grid(row=t, column=y)
+        case.grid(row=t, column=y) # Positionnement des cases
         for o in range (3):
             for p in range(3):
                 button = tk.Button(case, width=4, height=2, bg = "#FFECA1", padx=1, pady=1, font = "Arial", text="", command= lambda bonton = button: placer(bonton, valeur_chiffre))
-                button.grid(row=o, column=p)
+                button.grid(row=o, column=p) # Positionnement des boutons
                 
 
 
@@ -123,6 +123,8 @@ bouton_expert.config(command=niveau_expert) # Appelle la fonction pour choisir l
 # Creation d'un bouton pour commencer une nouvelle partie
 def nouvelle_partie():
     bouton_nouvelle_partie = tk.Toplevel() # Creation d'une nouvelle fenetre
+    
+
 
 bouton_nouvelle_partie.config(command=nouvelle_partie) # Appelle la fenetre pour commencer une nouvelle partie
 
@@ -134,11 +136,19 @@ def choisir_chiffre(chiffre):
     print(valeur_chiffre)
 
 # Remplir une case cliquée avec un chiffre 
-
+bontons = []
 def placer(bonton,valeur_chiffre): # Fonction pour changer le texte d'un bouton 
-    bonton.config(text=valeur_chiffre)
+    bonton.config(text=valeur_chiffre) # Change le texte du bouton par le chiffre selectionner 
     print(button)
+    bontons.append(bonton) # Ajouter la fontion placer das la liste des boutons choisies
+    print (bontons)
 
+def supprimer(bonton):
+    bontons.pop(bonton)
+    bonton.config(text="") # Supprimer le texte du bouton
+    
+bouton_supprime.config (command=supprimer)
+print(bontons)
     
 
 
