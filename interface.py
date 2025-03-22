@@ -147,7 +147,7 @@ bouton_supprime.config(command=supprimer_chiffre())
 
 
 
-
+print("Bonjour")
 
 # Lancer la boucle principale Tkinter
 fenetre_principal.mainloop()
