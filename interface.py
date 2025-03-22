@@ -59,7 +59,8 @@ for t in range (3):
         case.grid(row=t, column=y) # Positionnement des cases
         for o in range (3):
             for p in range(3):
-                button = tk.Button(case, width=4, height=2, bg = "#FFECA1", padx=1, pady=1, font = "Arial", text="", command= lambda bonton = button: placer(bonton, valeur_chiffre))
+                button = tk.Button(case, width=4, height=2, bg = "#FFECA1", padx=1, pady=1, font = "Arial", text=" ")
+                button.config(command= lambda bonton = button: placer(bonton, valeur_chiffre))
                 button.grid(row=o, column=p) # Positionnement des boutons
                 
 
@@ -74,6 +75,8 @@ label_temp = tk.Label(fenetre_sudoku, width=10, height=2, font=("Arial", 13))
 label_temp.place(x=580, y=15) # Positionement du label 
 # Fontion pour afficher le temps
 def creation_temps():
+
+    # documenter avec docstring svp
     global temps
     temps += 1
     heures = temps // 3600 # calucul des heures
@@ -95,14 +98,6 @@ def retour_arriere():
     pass
 bouton_reture.config(command=retour_arriere) # Appelle la fonction pour retourner en arriere
 
-# Creation d'un bouton pour supprimer un chiffre
-def supprimer_chiffre(bonton):
-    bontons.remove(bonton)
-    bonton.config(text=" ") # Supprimer le texte du bouton  
-bouton_supprime.config (command=supprimer_chiffre)
-
-    
-bouton_supprime.config(command=supprimer_chiffre) # Appelle la fonction pour supprimer un chiffre
 
 # Creation d'un bouton pour choisir le niveau facile 
 def niveau_facile():
@@ -128,9 +123,6 @@ bouton_expert.config(command=niveau_expert) # Appelle la fonction pour choisir l
 def nouvelle_partie():
     bouton_nouvelle_partie = tk.Toplevel() # Creation d'une nouvelle fenetre
 
-    
-
-
 bouton_nouvelle_partie.config(command=nouvelle_partie) # Appelle la fenetre pour commencer une nouvelle partie
 
 # Creation d'un bouton pour choisir un chiffre 
@@ -144,10 +136,17 @@ def choisir_chiffre(chiffre):
 bontons = []
 def placer(bonton,valeur_chiffre): # Fonction pour changer le texte d'un bouton 
     bonton.config(text=valeur_chiffre) # Change le texte du bouton par le chiffre selectionner 
-    print(button)
     bontons.append(bonton) # Ajouter la fontion placer das la liste des boutons choisies
 
- 
+ # Creation d'un bouton pour supprimer un chiffre
+def supprimer_chiffre():
+    if bontons:  # Vérifie s'il y a des boutons dans la liste
+        dernier_bouton = bontons.pop()  # Récupère le dernier bouton ajouté
+        dernier_bouton.config(text=" ")  # Réinitialise le texte du bouton
+bouton_supprime.config(command=supprimer_chiffre())
+
+
+
 
 
 # Lancer la boucle principale Tkinter
