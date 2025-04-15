@@ -87,14 +87,14 @@ def dessiner_lignes(canva, hauteur):
     y = hauteur//3
 # Création de la grille principale
     for i in range(10):  
-        canva.create_line(0, i * x, hauteur, i * x, fill="black", width=2) 
+        canva.create_line(0, i * x, hauteur, i * x, fill="black", width=2, tags="ligne") 
     for j in range(10):  
-        canva.create_line(j * x, 0, j * x, hauteur, fill="black", width=2)
+        canva.create_line(j * x, 0, j * x, hauteur, fill="black", width=2, tags="ligne")
 # On dessine les bordure épaisses 
     for i in range(4):
-        canva.create_line(0, i * y-3, hauteur, i * y-3, fill="black", width=5)
+        canva.create_line(0, i * y-3, hauteur, i * y-3, fill="black", width=5, tags="ligne")
     for j in range(4):    #Ne surtout pas toucher, les "-3" sont des ajustements
-        canva.create_line(j * y-3, 0, j * y-3, hauteur, fill="black", width=5)
+        canva.create_line(j * y-3, 0, j * y-3, hauteur, fill="black", width=5, tags="ligne")
 
 nb_vies = 15
 
@@ -106,13 +106,15 @@ def afficher_sauvegarde_effectuee(sauvegarde, fenetre):
 def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Choisi, i, j, jeu, affichage_vie, debut, Choix_numero, sauvegarde):
     global nb_vies, case_cliquee
     if reponse == grille_sans_vide[i][j]:
-        jeu.create_rectangle(55*j+5, 55*i+5, 55*(j+1)-5, 55*(i+1)-5, fill="white", outline = "white") #Les +5, -5 sont de simples ajustements
+        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") #Les +5, -5 sont de simples ajustements
+        jeu.tag_raise("ligne")
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_sans_vide[i][j]), fill="black", font=("Arial", 25))
         grille[i][j] = grille_sans_vide[i][j]
         jeu.delete(case_cliquee)
     if grille[i][j] == 0:
         jeu.delete(case_cliquee)
-        jeu.create_rectangle(55*j+5, 55*i+5, 55*(j+1)-5, 55*(i+1)-5, fill="red") 
+        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="red") 
+        jeu.tag_raise("ligne")
         nb_vies = nb_vies-1
         affichage_vie.config(text=f"Vies restantes : {nb_vies}")
         if nb_vies <= 0:
@@ -123,7 +125,7 @@ def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Chois
         effacer_widget(Choisi)
         victoire = Label(Choisi, text = "Bravo, vous avez gagné !", font=("Arial",25), bg="white").pack(expand=YES)
         erreurs = Label(Choisi, text=f"- Nombres d'erreurs comises : {15 - nb_vies}", bg="white").pack()
-        temps = Label(Choisi, text=f"Chronomètre : {time.perf_counter() - debut}", bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes
+        temps = Label(Choisi, text=f"Chronomètre : {int(time.perf_counter() - debut)}s", bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes
         retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="white" ,command=Choisi.destroy).pack(expand=YES)
         sauvegarder = Button(Choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, Choisi), bg="white").pack()
 
@@ -142,7 +144,8 @@ def aide_visuelle(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu):
 # Comme son nom l'indique
 def effacer_nombre(jeu, effacer, i, j, grille_a_sauvegarder, grille, grille_sans_vide):
     grille[i][j] = 0
-    jeu.create_rectangle(55*j+5, 55*i+5, 55*(j+1)-5, 55*(i+1)-5, fill="white", outline = "white")
+    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+    jeu.tag_raise("ligne")
 
 case_cliquee = None
 
@@ -162,7 +165,8 @@ def cliquer_case(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu, pos
                 break
         if trouvé:
             break
-    case_cliquee = jeu.create_rectangle(55*j+1, 55*i, 55*(j+1)-1, 55*(i+1)-2, fill="black")
+    case_cliquee = jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="black")
+    jeu.tag_raise("ligne")
     Boite_information = Frame(position)
     Boite_information.grid(row=2, column=0)
     if grille_a_sauvegarder[i][j] == 0 and grille[i][j] != 0:  #On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
@@ -184,7 +188,9 @@ def validation_aide(Aide, jeu, grille_sans_vide, grille, Choisi, aide_entry):
             for j in range(len(grille_sans_vide[0])):
                 if grille_sans_vide[i][j] == int(aide_entry.get()):
                     grille[i][j] = grille_sans_vide[i][j]
+                    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3")
                     jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_sans_vide[i][j]), fill="black", font=("Arial", 25))  
+                    jeu.tag_raise("ligne")
         Aide.destroy()
     
 
@@ -203,7 +209,7 @@ def aide(jeu, grille_sans_vide, grille, Choisi):
 def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
     """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
     Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
-    global nb_vies
+    global nb_vies, carre_colorie
     debut = time.perf_counter() #C'est comme si on actionnait le chrono :)
     Choisi = Toplevel(racine)
     Choisi.resizable(False, False)
@@ -229,8 +235,7 @@ def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
     affichage_vie = Label(Boite_menu, text=f"Vies restantes : {nb_vies}", bg="white", font=("Arial", 15))
     affichage_vie.grid(row=3, column=1)
     Choisi.bind("<Motion>", lambda event: aide_visuelle(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu))
-
-    jeu = Canvas(Choisi, width=497, height=497, bg="white")
+    jeu = Canvas(Choisi, width=495, height=495, bg="white", highlightbackground="black")
     jeu.grid(row=0)
     dessiner_lignes(jeu, 500)
     dessiner_numeros(grille, jeu, 500, 25)
@@ -252,16 +257,16 @@ def choisir_sauvegarde():
         grille_a_sauvegarder = donnees[modele]["Grille de depart"]
         grille_en_cours = donnees[modele]["Grille en cours"]
         grille_sans_vide = donnees[modele]["Grille corrigee"]
-        boite_sauvegarde = Frame(sauvegardes, bg="#51aeb0")
-        nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="#51aeb0", font=("Arial", 15)).grid(row=0, column=0)
+        boite_sauvegarde = Frame(sauvegardes, bg="white")
+        nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="white", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
         resultat = IntVar()
-        option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=resultat, bg="#ded26f")
+        option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=resultat, bg="grey")
         option_aide.grid(row=2, column=1)
-        depuis_debut = Button(boite_sauvegarde, bg="#ded26f", text="Recommencer le modèle depuis le début", command=lambda i=i:nouveau_jeu(liste_sudoku[i], grille_sans_vide, i+1, grille_a_sauvegarder, resultat)) 
+        depuis_debut = Button(boite_sauvegarde, bg="grey", fg="white", text="Recommencer le modèle depuis le début", command=lambda i=i:nouveau_jeu(liste_sudoku[i], grille_sans_vide, i+1, grille_a_sauvegarder, resultat)) 
         depuis_debut.grid(row=1, column=0)  
-        continuer = Button(boite_sauvegarde, bg="#ded26f", text="Continuer le modèle", command=lambda i=i:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat)) 
+        continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat)) 
         continuer.grid(row=2, column=0)   
         i += 1
 
@@ -296,7 +301,7 @@ def choix_modele(Niveau):
     for i in range(6):
         boite = Frame(Choix, bg="grey")
         boite.grid(row=i//3, column=i%3, padx=25, pady=25)
-        cases_modele = Canvas(boite, width=255, height=255, bg="white")
+        cases_modele = Canvas(boite, width=255, height=255, bg="white", highlightbackground="black")
         cases_modele.grid(row=0)
         """i//3 permet de placer les trois premiers canvas sur la première ligne avec la division entière, i%3 renvoie le reste 
         et place le canvas sur la colonne souhaitée, padx, pady sont utiles pour les espaces"""
@@ -307,8 +312,8 @@ def choix_modele(Niveau):
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
-        bouton = Button(boite, text=f"Choisir le modèle {i+1}", activebackground="white", command=lambda i=i, grille_sans_vide = grille_sans_vide, grille_a_sauvegarder = grille_a_sauvegarder:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat)) #On est obligé d'utiliser lambda à cause des parenthèses
-        bouton.grid(row=1)                              #Car i change de valeur à chaque itération? on la stock donc.
+        choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_sans_vide = grille_sans_vide, grille_a_sauvegarder = grille_a_sauvegarder:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat))
+                        #Car i change de valeur à chaque itération? on la stock donc.
 
 def jouer_au_sudoku():
     effacer_widget(racine)
@@ -316,21 +321,25 @@ def jouer_au_sudoku():
     boite_widget.pack(expand=YES, side=BOTTOM)
     difficulte = Label(racine, text="Choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
-    Facile = Button(boite_widget, text="Facile", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3, bg="#ded26f")
+    Facile = Button(boite_widget, text="Facile", fg="white", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Facile.grid(row=1, column=0)
-    Moyen = Button(boite_widget, text="Moyen", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3, bg="#ded26f")
+    Moyen = Button(boite_widget, text="Moyen", fg="white", bg="grey", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
     Moyen.grid(row=1, column=1)
-    Difficile = Button(boite_widget, text="Difficile", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3, bg="#ded26f")
+    Difficile = Button(boite_widget, text="Difficile", fg="white", bg="grey", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    test = Button(boite_widget, text="test", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3, bg="#ded26f")
+    test = Button(boite_widget, text="test", fg="white", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     test.grid(row=1, column=3)
 
 boite_widget = Frame(racine)
 boite_widget.pack(expand=YES, side=BOTTOM)
 
-Choix = Label(racine, text="Sélectionner le jeu auquel vous voulez jouer", font=("Times", 35, "bold"), bg="white")
+Choix = Label(racine, text="Sélectionner le jeu auquel vous voulez jouer.", font=("Times", 35, "bold"), bg="white")
 Choix.pack(expand=YES, side=TOP)
-Choix_sudoku = Button(boite_widget, text="Sudoku", width=10, font=("Times", 25), height=3, bg="#ded26f", command=jouer_au_sudoku).pack(side=LEFT)
-choix_Hitori = Button(boite_widget, text="Hitori", width=10, font=("Times", 25), height=3, bg="#ded26f").pack(side=RIGHT)
+Choix_sudoku = Button(boite_widget, text="Sudoku", width=10, fg="white", bg="grey", font=("Times", 25), height=3, command=jouer_au_sudoku).pack(side=LEFT)
+choix_Hitori = Button(boite_widget, text="Hitori", width=10, fg="white", bg="grey", font=("Times", 25), height=3).pack(side=RIGHT)
+
+img = PhotoImage(file="")
+label = Label(racine, image=img)
+label.pack()
 
 racine.mainloop()
