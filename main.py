@@ -17,6 +17,7 @@ def effacer_widget(fenetre):
 
 # On va écrire la sauvegarde dans le fichier json
 def ajouter_sauvegarde(sauvegarde):
+    sauvegarde["Nombre de vie"] = nb_vies #car nb_vies est modifié globalement, on la sauvegarde donc uniquement lorsqu'on appuie sur sauvegarder
     with open("sauvegardes.json", "r") as fichier:
         try:
             ajout = json.load(fichier)
@@ -104,7 +105,7 @@ def afficher_sauvegarde_effectuee(sauvegarde, fenetre):
 
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Choisi, i, j, jeu, affichage_vie, debut, Choix_numero, sauvegarde):
-    global nb_vies, case_cliquee
+    global nb_vies, case_cliquee, nb_erreurs
     if reponse == grille_sans_vide[i][j]:
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") #Les +5, -5 sont de simples ajustements
         jeu.tag_raise("ligne")
@@ -119,15 +120,16 @@ def verifier_reponse(reponse, grille_sans_vide, grille, boite_information, Chois
         affichage_vie.config(text=f"Vies restantes : {nb_vies}")
         if nb_vies <= 0:
             effacer_widget(Choisi)
-            defaite = Label(Choisi, text = "Dommage, vous avez perdu..", font=("Arial",25), bg="#51aeb0").pack(expand=YES)
-            Retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="#ded26f" ,command=Choisi.destroy).pack(expand=YES)
+            defaite = Label(Choisi, text = "Dommage, vous avez perdu..", font=("Arial",25), bg="white").pack(expand=YES)
+            Retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=Choisi.destroy).pack(expand=YES)
     if grille_sans_vide == grille:
         effacer_widget(Choisi)
-        victoire = Label(Choisi, text = "Bravo, vous avez gagné !", font=("Arial",25), bg="white").pack(expand=YES)
-        erreurs = Label(Choisi, text=f"- Nombres d'erreurs comises : {15 - nb_vies}", bg="white").pack()
-        temps = Label(Choisi, text=f"Chronomètre : {int(time.perf_counter() - debut)}s", bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes
-        retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="white" ,command=Choisi.destroy).pack(expand=YES)
-        sauvegarder = Button(Choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, Choisi), bg="white").pack()
+        victoire = Label(Choisi, text = "Bravo, vous avez gagné !", font=("Arial",21), bg="white").pack(expand=YES)
+        erreurs = Label(Choisi, text=f"- Nombres d'erreurs comises : {15 - nb_vies}", font=("Arial", 15), bg="white").pack()
+        temps = Label(Choisi, text=f"- Chronomètre : {int(time.perf_counter() - debut)}s", font=("Arial", 15), bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes
+        sauvegarder = Button(Choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, Choisi),width=25, height=2, bg="grey", fg="white").pack()
+        retour = Button(Choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey", fg="white" ,command=Choisi.destroy).pack(expand=YES)
+
 
 
 carre_colorie = None
@@ -205,24 +207,23 @@ def aide(jeu, grille_sans_vide, grille, Choisi):
     valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(Aide, jeu, grille_sans_vide, grille, Choisi, aide_entry))
     valider_bouton.pack(side=BOTTOM)
 
-fenetre_secondaire = None
-
 # Fonction créant le sudoku correspondant au modèle choisit, crée la potentielle sauvegarde
-def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
+def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat, nb_vies_sauvegarde=15):
     """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
     Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
-    global nb_vies, carre_colorie, fenetre_secondaire
+    global carre_colorie, nb_vies
+    nb_vies = nb_vies_sauvegarde
     debut = time.perf_counter() #C'est comme si on actionnait le chrono :)
     Choisi = Toplevel(racine)
     Choisi.resizable(False, False)
     Choisi.geometry("500x650")
     Choisi.title(f"Modèle {i}")
     Choisi.config(bg="white")
-
+    #REGLER LE PROBLEME DE SAUVEGARDE!!!
     sauvegarde = {"Grille de depart" : grille_a_sauvegarder,
                   "Grille en cours" : grille,
                   "Grille corrigee" : grille_sans_vide}
-                            
+    
     menu = Menu(Choisi)
     if resultat.get() == 1:
         Aide = menu.add_command(label="Aide", command=lambda:aide(jeu, grille_sans_vide, grille, Choisi))
@@ -233,7 +234,6 @@ def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
     Boite_menu = Frame(Choisi)
     Boite_menu.grid(row=1)
 
-    nb_vies = 15
     affichage_vie = Label(Boite_menu, text=f"Vies restantes : {nb_vies}", bg="white", font=("Arial", 15))
     affichage_vie.grid(row=3, column=1)
     jeu = Canvas(Choisi, width=495, height=495, bg="white", highlightbackground="black")
@@ -259,6 +259,7 @@ def choisir_sauvegarde():
         grille_a_sauvegarder = donnees[modele]["Grille de depart"]
         grille_en_cours = donnees[modele]["Grille en cours"]
         grille_sans_vide = donnees[modele]["Grille corrigee"]
+        nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
         boite_sauvegarde = Frame(sauvegardes, bg="white")
         nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="white", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
@@ -266,30 +267,36 @@ def choisir_sauvegarde():
         resultat = IntVar()
         option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=resultat, bg="grey")
         option_aide.grid(row=2, column=1)
-        depuis_debut = Button(boite_sauvegarde, bg="grey", fg="white", text="Recommencer le modèle depuis le début", command=lambda i=i:nouveau_jeu(liste_sudoku[i], grille_sans_vide, i+1, grille_a_sauvegarder, resultat)) 
+        depuis_debut = Button(boite_sauvegarde, bg="grey", fg="white", text="Recommencer le modèle depuis le début", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_sans_vide, i+1, grille_a_sauvegarder, resultat, 15)) 
         depuis_debut.grid(row=1, column=0)  
-        continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat)) 
+        continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat, nb_vie_sauvegarde)) 
         continuer.grid(row=2, column=0)   
         i += 1
 
-couleurs = ["yellow", "black", "green", "blue", "red", "grey", "orange"]
+couleurs = ["black", "green", "blue", "red", "grey", "orange"]
 
+#uniquement pour l'animation.
 def deplacer(label, descend, root):
-    label.config(fg=f"{couleurs[randint(0, len(couleurs)-1)]}")
-    pos = label.place_info()
-    place_x = int(pos['x'])
-    place_y = int(pos['y'])
-    if descend:
-        place_y += 1
-    else:
-        place_y -= 1
-    if place_y == 61:
-        descend = False
-    elif not descend and place_y == 0:
-        descend = True
-    place_y 
-    label.place(x=place_x, y=place_y)
-    root.after(70, lambda: deplacer(label,descend,root))
+    """ Comme on utilise une fonction de regénération de modèle (qui supprime tout puis fait réapparaitre), la fonction tentera de manipuler
+    des widgets qui n'existent plus (car la fonction se répète après 70ms) et renvera donc une erreur, on prévoit cela """
+    try:
+        label.config(fg=f"{couleurs[randint(0, len(couleurs)-1)]}")
+        pos = label.place_info()
+        place_x = int(pos['x'])
+        place_y = int(pos['y'])
+        if descend:
+            place_y += 1
+        else:
+            place_y -= 1
+        if place_y == 61:
+            descend = False
+        elif not descend and place_y == 0:
+            descend = True
+        place_y 
+        label.place(x=place_x, y=place_y)
+        root.after(70, lambda: deplacer(label,descend,root))
+    except TclError:
+        return 
 
 # Menu principal du sudoku
 def choix_modele(Niveau):
