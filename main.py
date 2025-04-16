@@ -205,11 +205,13 @@ def aide(jeu, grille_sans_vide, grille, Choisi):
     valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(Aide, jeu, grille_sans_vide, grille, Choisi, aide_entry))
     valider_bouton.pack(side=BOTTOM)
 
+fenetre_secondaire = None
+
 # Fonction créant le sudoku correspondant au modèle choisit, crée la potentielle sauvegarde
 def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
     """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
     Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
-    global nb_vies, carre_colorie
+    global nb_vies, carre_colorie, fenetre_secondaire
     debut = time.perf_counter() #C'est comme si on actionnait le chrono :)
     Choisi = Toplevel(racine)
     Choisi.resizable(False, False)
@@ -234,12 +236,12 @@ def nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i, grille, resultat):
     nb_vies = 15
     affichage_vie = Label(Boite_menu, text=f"Vies restantes : {nb_vies}", bg="white", font=("Arial", 15))
     affichage_vie.grid(row=3, column=1)
-    Choisi.bind("<Motion>", lambda event: aide_visuelle(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu))
     jeu = Canvas(Choisi, width=495, height=495, bg="white", highlightbackground="black")
     jeu.grid(row=0)
     dessiner_lignes(jeu, 500)
     dessiner_numeros(grille, jeu, 500, 25)
     jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu, Choisi, nb_vies, affichage_vie, debut, sauvegarde))
+    jeu.bind("<Motion>", lambda event: aide_visuelle(event, grille_a_sauvegarder, grille_sans_vide, grille, jeu))
 
 
 # Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
@@ -270,11 +272,52 @@ def choisir_sauvegarde():
         continuer.grid(row=2, column=0)   
         i += 1
 
+couleurs = ["yellow", "black", "green", "blue", "red", "grey", "orange"]
+
+def deplacer(label, descend, root):
+    label.config(fg=f"{couleurs[randint(0, len(couleurs)-1)]}")
+    pos = label.place_info()
+    place_x = int(pos['x'])
+    place_y = int(pos['y'])
+    if descend:
+        place_y += 1
+    else:
+        place_y -= 1
+    if place_y == 61:
+        descend = False
+    elif not descend and place_y == 0:
+        descend = True
+    place_y 
+    label.place(x=place_x, y=place_y)
+    root.after(70, lambda: deplacer(label,descend,root))
+
 # Menu principal du sudoku
 def choix_modele(Niveau):
     effacer_widget(racine)
-    Texte_modele = Label(racine, text="Choisir le modèle",  bg="white", font=("Times", 35, "bold"))
-    Texte_modele.pack(side=TOP, expand=YES)
+
+    frame_animation = Frame(racine, width=300, height=110, bg="white")
+    frame_animation.pack(side=TOP)
+
+    s = Label(frame_animation, text="S", bg="white", font=("Arial", 30))
+    s.place(x=0, y=0)
+    u = Label(frame_animation, text="u", bg="white", font=("Arial", 30))
+    u.place(x=50, y=15)
+    d = Label(frame_animation, text="d", bg="white", font=("Arial", 30))
+    d.place(x=100, y=30)
+    o = Label(frame_animation, text="o", bg="white", font=("Arial", 30))
+    o.place(x=150, y=45)
+    k = Label(frame_animation, text="k", bg="white", font=("Arial", 30))
+    k.place(x=200, y=60)
+    u2 = Label(frame_animation, text="u", bg="white", font=("Arial", 30))
+    u2.place(x=250, y=50)
+
+    deplacer(s,descend = True, root=racine)
+    deplacer(u,descend = True, root=racine)
+    deplacer(d,descend = True, root=racine)
+    deplacer(o,descend = True, root=racine)
+    deplacer(k,descend=False, root=racine)
+    deplacer(u2,descend=False, root=racine)   
+
     Boite_option = Frame(racine)
     Boite_option.pack(side=TOP, expand=YES)
     option = Label(Boite_option, text="Options :", fg="black")
@@ -291,6 +334,13 @@ def choix_modele(Niveau):
     ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", command=lambda:webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debutants-complets/"))
     ouvrir_notice.pack(side=RIGHT, padx=20)
 
+    def zoom_modele(case_modele, event):
+        case_modele.scale("all", 0, 0, 0.9, 0.9)
+        case_modele.config(width=230, height=230)
+
+    def reset_modele(case_modele, event):
+        case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
+        case_modele.config(width=255, height=255)
 
     racine.config(bg="white")
     boite_widget.destroy()
@@ -313,7 +363,10 @@ def choix_modele(Niveau):
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
         choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_sans_vide = grille_sans_vide, grille_a_sauvegarder = grille_a_sauvegarder:nouveau_jeu(grille_a_sauvegarder, grille_sans_vide, i+1, liste_sudoku[i], resultat))
-                        #Car i change de valeur à chaque itération? on la stock donc.
+                                                 #Car i change de valeur à chaque itération? on la stock donc.                                  
+        cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
+        cases_modele.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
+                           
 
 def jouer_au_sudoku():
     effacer_widget(racine)
