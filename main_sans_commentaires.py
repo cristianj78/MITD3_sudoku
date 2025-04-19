@@ -100,6 +100,7 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
         grille[i][j] = grille_corrigee[i][j]
         jeu.delete(case_cliquee)
+        jeu.tag_raise("ligne")
     if grille[i][j] == 0: 
         jeu.delete(case_cliquee)
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="red") 
@@ -359,7 +360,7 @@ def jouer_au_sudoku():
     effacer_widget(racine)
     boite_widget = Frame(racine) 
     boite_widget.pack(expand=YES, side=BOTTOM)
-    difficulte = Label(racine, text="modele_choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
+    difficulte = Label(racine, text="choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
     Facile = Button(boite_widget, text="Facile", fg="white", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Facile.grid(row=1, column=0)
