@@ -2,6 +2,24 @@ import tkinter as tk
 import fonctions as fct
 
 
+def set_difficulte(difficulte_choisi,button_a_desactiver):
+    global difficulte, sudoku_liste_choix
+    difficulte = difficulte_choisi
+    sudoku_liste_choix = fct.changement_difficulte(
+        difficulte,
+        liste_button,
+        button_a_desactiver,
+        button_facile,
+        button_normal,
+        button_difficile,
+        button_extreme
+    )
+    label_indication_difficulte.config(text=f"Difficulté: {difficulte}")
+
+# def set_index(index):
+#     global sudoku_choisi
+#     sudoku_choisi = index
+
 bg_color = "#E2EAF4"
 
 root = tk.Tk()
@@ -15,7 +33,7 @@ Accueil = menu.add_command(label="Accueil")
 menu.add_separator()
 Nouvelle_partie = menu.add_command(label="Nouvelle Partie", command=lambda: fct.changement_frame(root, menu, frame_menu, frame_nouvelle_partie, frame_nouvelle_partie))
 menu.add_separator()
-Sauvegarder = menu.add_command(label="Sauvegarder")
+Sauvegarder = menu.add_command(label="Sauvegarder", state="disabled")
 menu.add_separator()
 Quitter = menu.add_command(label="Quitter", command=root.destroy)
 
@@ -55,7 +73,7 @@ frame_buttons.pack(fill="both")
 button_reprendre = tk.Button(frame_buttons, text="Reprendre la partie", font=("Arial", 27))
 button_reprendre.pack(pady=10)
 
-button_nvl_partie = tk.Button(frame_buttons, text="Nouvelle partie", font=("Arial", 27), command=lambda: fct.changement_frame(root, menu, frame_menu, frame_nouvelle_partie, frame_nouvelle_partie))
+button_nvl_partie = tk.Button(frame_buttons, text="Nouvelle partie", font=("Arial", 27), command=lambda: fct.changement_frame(root, menu, frame_menu, frame_nouvelle_partie, frame_partie_jouable, frame_nouvelle_partie, label_time))
 button_nvl_partie.pack(pady=10)
 
 button_reprendre_sauvegarde = tk.Button(frame_buttons, text="Autres sauvegardes", font=("Arial", 27))
@@ -71,10 +89,10 @@ frame_difficulte = tk.Frame(frame_nouvelle_partie, bg=bg_color)
 
 label_difficulte = tk.Label(frame_difficulte, text="Choisis la difficulté", bg=bg_color, font=("Arial", 13))
 
-button_facile = tk.Button(frame_difficulte, text="Facile", font=("Arial", 13), command=lambda: fct.changement_difficulte("Facile", liste_button, button_facile, button_facile, button_normal, button_difficile, button_extreme))
-button_normal = tk.Button(frame_difficulte, text="Normal", font=("Arial", 13), state="disabled", command=lambda: fct.changement_difficulte("Normal", liste_button, button_normal, button_facile, button_normal, button_difficile, button_extreme))
-button_difficile = tk.Button(frame_difficulte, text="Difficile", font=("Arial", 13), command=lambda: fct.changement_difficulte("Difficile", liste_button, button_difficile, button_facile, button_normal, button_difficile, button_extreme))
-button_extreme = tk.Button(frame_difficulte, text="Extreme", font=("Arial", 13), command=lambda: fct.changement_difficulte("Extreme", liste_button, button_extreme, button_facile, button_normal, button_difficile, button_extreme))
+button_facile = tk.Button(frame_difficulte, text="Facile", font=("Arial", 13), command=lambda: set_difficulte("Facile", button_facile))
+button_normal = tk.Button(frame_difficulte, text="Normal", font=("Arial", 13), state="disabled", command=lambda: set_difficulte("Normal", button_normal))
+button_difficile = tk.Button(frame_difficulte, text="Difficile", font=("Arial", 13), command=lambda: set_difficulte("Difficile", button_difficile))
+button_extreme = tk.Button(frame_difficulte, text="Extreme", font=("Arial", 13), command=lambda: set_difficulte("Extreme", button_extreme))
 frame_modeles = tk.Frame(frame_nouvelle_partie, bg=bg_color, pady= 10)
 
 
@@ -120,16 +138,68 @@ for a in range(2):
                         # button.config(command= lambda bonton = button: placer(bonton, valeur_chiffre))
                         label.grid(row=k, column=l) # Positionnement des boutons
                         liste_button[a][b][i][j][k].append(label)
-        button_choisir_modele = tk.Button(frame_grille_bouton, text="Choisir ce modèle")
+        
+        button_choisir_modele = tk.Button(frame_grille_bouton, text="Choisir ce modèle", command=lambda sudoku_choisi=index: (fct.changement_frame(root, menu, frame_menu, frame_nouvelle_partie, frame_partie_jouable, frame_partie_jouable, label_time), fct.generation_sudoku(sudoku_choisi, frame_grille_jouable, sudoku_liste_choix)))
         button_choisir_modele.pack()
         index+=1
 
 #FRAME PARTIE JOUABLE
+frame_partie_jouable = tk.Frame(root, bg=bg_color)
 
-frame_partie_jouable = tk.Frame(root)
+    #FRAME LABEL
+
+frame_haut_label = tk.Frame(frame_partie_jouable, bg=bg_color)
+frame_haut_label.pack(pady=10, fill="x")
 
 
+label_indication_difficulte = tk.Label(frame_haut_label, text=f"Difficulté: {difficulte}", font=("Arial", 13), bg=bg_color)
+label_indication_difficulte.pack(side="left")
 
+label_time = tk.Label(frame_haut_label, text="Test", font=("Arial", 13), bg=bg_color)
+label_time.pack(side="right")
+
+    #FRAME SUDOKU
+
+frame_sudoku_jouable = tk.Frame(frame_partie_jouable, bg=bg_color)
+frame_sudoku_jouable.pack(pady=10, fill="x")
+
+liste_button_jouable = []
+
+frame_grille_jouable = tk.Frame(frame_sudoku_jouable, bg=bg_color)
+frame_grille_jouable.pack(side="left", padx=15)
+root.bind("<Key>", lambda event: fct.changement_nombre(event))
+# frame_grille_jouable.focus_set()
+# for i in range(3):
+#     liste_button_jouable.append([])
+#     for j in range(3):
+#         liste_button_jouable[i].append([])
+#         case = tk.Frame(frame_grille_jouable, bg = "black", padx=1, pady=1)
+#         case.grid(row=i, column=j) # Positionnement des cases
+#         for k in range(3):
+#             liste_button_jouable[i][j].append([])
+#             for l in range(3):
+#                 label = tk.Label(case, width=2, height=1, bg = "#FFECA1", padx=1, pady=1, font = ("Arial", 14), text=str(sudoku_liste_choix[sudoku_choisi][i][j][k][l]) if sudoku_liste_choix[sudoku_choisi][i][j][k][l] != 0 else "", borderwidth=1, relief="solid")
+#                 # label.config(command= lambda bonton = button: placer(bonton, valeur_chiffre))
+#                 label.grid(row=k, column=l) # Positionnement des boutons
+#                 liste_button_jouable[i][j][k].append(label)
+
+frame_button_placement = tk.Frame(frame_sudoku_jouable, bg="#c2d7f1")
+frame_button_placement.pack(ipadx=3, ipady=3, padx=3)
+
+frame_2_button = tk.Frame(frame_button_placement, bg=bg_color)
+frame_2_button.grid(column=0, row=0, columnspan=3, pady=5)
+
+button_revenir_arriere = tk.Button(frame_2_button, text="R", font=("Arial", 20))
+button_revenir_arriere.pack(side="left", padx=1, ipadx=20, ipady=20)
+button_effacer = tk.Button(frame_2_button, text="X", font=("Arial", 20), command= lambda: fct.boutton_changement_nombre(""))
+button_effacer.pack(side="right", ipadx=20, ipady=20)
+
+nombre = 0
+for i in range(3):
+    for k in range(3):
+        nombre +=1
+        button_choix = tk.Button(frame_button_placement, text= str(nombre), font=("Arial", 20), fg="white", bg="#474747", command= lambda nbr=nombre: fct.boutton_changement_nombre(nbr))
+        button_choix.grid(column=k, row=1+i, padx=2, pady=2, ipadx=20, ipady=20)
 
 
 
