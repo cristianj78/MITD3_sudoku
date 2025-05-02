@@ -168,12 +168,14 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
             """exactement le même principe que pour la fonction "cliquer case"""
             if (x * 55) <= event.x < ((x + 1) * 55) and (y * 55) <= event.y < ((y + 1) * 55): 
                 care_colorie = jeu.create_rectangle(55*x, 55*y, 55*(x+1), 55*(y+1), fill="grey")
+                jeu.tag_raise("ligne")
 
 # Comme son nom l'indique
 def effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee):
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
     jeu.tag_raise("ligne")
+    effacer.destroy()
 
 case_cliquee = None
 
@@ -364,7 +366,7 @@ def choix_modele(Niveau):
     a_coche_aide = IntVar()
     option_aide = Checkbutton(Boite_option, text="Aide", variable=a_coche_aide, bg="white")
     option_aide.pack(side=RIGHT, padx=20)
-    difficulté_retour = Button(Boite_option, text="choisir la difficulté", bg= "white", command=jouer_au_sudoku)
+    difficulté_retour = Button(Boite_option, text="Choisir la difficulté", bg= "white", command=jouer_au_sudoku)
     difficulté_retour.pack(side=RIGHT, padx=20)
     ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", command=lambda:webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debut_chronoants-complets/"))
     ouvrir_notice.pack(side=RIGHT, padx=20)
@@ -378,7 +380,6 @@ def choix_modele(Niveau):
         case_modele.config(width=255, height=255)
 
     racine.config(bg="white")
-    boite_widget.destroy()
     Choix = Frame(racine, bg="grey")
     Choix.pack()
     liste_sudoku = []
@@ -386,6 +387,8 @@ def choix_modele(Niveau):
     for i in range(6):
         boite = Frame(Choix, bg="grey")
         boite.grid(row=i//3, column=i%3, padx=25, pady=25)
+        cases_zoom = Canvas(boite, width=255, height=255, bg="grey", highlightbackground="grey")
+        cases_zoom.grid(row=0)
         cases_modele = Canvas(boite, width=255, height=255, bg="white", highlightbackground="black")
         cases_modele.grid(row=0)
         """i//3 permet de placer les trois premiers canvas sur la première ligne avec la division entière, i%3 renvoie le reste 
@@ -400,34 +403,29 @@ def choix_modele(Niveau):
         choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_corrigee = grille_corrigee, grille_de_depart = grille_de_depart:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide))
                                                  #Car i change de valeur à chaque itération? on la stock donc.                                  
         cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
+        cases_zoom.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
+        cases_zoom.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
         cases_modele.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
+        
                            
 
 def jouer_au_sudoku():
     effacer_widget(racine)
     boite_widget = Frame(racine) #On l'a recréée parce qu'on vient de la delete
     boite_widget.pack(expand=YES, side=BOTTOM)
-    difficulte = Label(racine, text="choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
+    difficulte = Label(racine, text="Choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
-    Facile = Button(boite_widget, text="Facile", fg="white", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
+    Facile = Button(boite_widget, text="Facile", fg="black", bg="#dedede", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Facile.grid(row=1, column=0)
-    Moyen = Button(boite_widget, text="Moyen", fg="white", bg="grey", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
+    Moyen = Button(boite_widget, text="Moyen", fg="black", bg="#b2b1b1", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
     Moyen.grid(row=1, column=1)
-    Difficile = Button(boite_widget, text="Difficile", fg="white", bg="grey", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3)
+    Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    test = Button(boite_widget, text="test", fg="white", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
+    """
+    test = Button(boite_widget, text="test", fg="black", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     test.grid(row=1, column=3)
+    """
 
-boite_widget = Frame(racine)
-boite_widget.pack(expand=YES, side=BOTTOM)
-
-Choix = Label(racine, text="Sélectionner le jeu auquel vous voulez jouer.", font=("Times", 35, "bold"), bg="white")
-Choix.pack(expand=YES, side=TOP)
-Choix_sudoku = Button(boite_widget, text="Sudoku", width=10, fg="white", bg="grey", font=("Times", 25), height=3, command=jouer_au_sudoku).pack(side=LEFT)
-choix_Hitori = Button(boite_widget, text="Hitori", width=10, fg="white", bg="grey", font=("Times", 25), height=3).pack(side=RIGHT)
-
-img = PhotoImage(file="")
-label = Label(racine, image=img)
-label.pack()
+jouer_au_sudoku()
 
 racine.mainloop()
