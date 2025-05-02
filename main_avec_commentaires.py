@@ -201,7 +201,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
         effacer = Button(position, text="effacer ce nombre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee))
         effacer.grid(row=7, column=0)
     if grille[i][j] == 0:
-        Choix_numero = Label(position, text=f"modele_choisissez un numéro pour ({i+1}, {j+1})", bg="white") #On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
+        Choix_numero = Label(position, text=f"choisissez un numéro pour ({i+1}, {j+1})", bg="white") #On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
         Choix_numero.grid(row=5, column=0) 
         for k in range(1, 10):
             Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_information, position, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde), width=5, height=2, bg="grey", fg="white")
@@ -227,7 +227,7 @@ def aide(jeu, grille_corrigee, grille, modele_choisi):
     Aide.geometry("300x75")
     Aide.resizable(False, False)
     Aide.title("Aide")
-    aide_text = Label(Aide, text="modele_choisissez un numéro, il sera révélé là où il apparait").pack(side=TOP)
+    aide_text = Label(Aide, text="choisissez un numéro, il sera révélé là où il apparait").pack(side=TOP)
     aide_entry = Entry(Aide)
     aide_entry.pack()
     valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry))
@@ -364,7 +364,7 @@ def choix_modele(Niveau):
     a_coche_aide = IntVar()
     option_aide = Checkbutton(Boite_option, text="Aide", variable=a_coche_aide, bg="white")
     option_aide.pack(side=RIGHT, padx=20)
-    difficulté_retour = Button(Boite_option, text="modele_choisir la difficulté", bg= "white", command=jouer_au_sudoku)
+    difficulté_retour = Button(Boite_option, text="choisir la difficulté", bg= "white", command=jouer_au_sudoku)
     difficulté_retour.pack(side=RIGHT, padx=20)
     ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", command=lambda:webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debut_chronoants-complets/"))
     ouvrir_notice.pack(side=RIGHT, padx=20)
@@ -407,7 +407,7 @@ def jouer_au_sudoku():
     effacer_widget(racine)
     boite_widget = Frame(racine) #On l'a recréée parce qu'on vient de la delete
     boite_widget.pack(expand=YES, side=BOTTOM)
-    difficulte = Label(racine, text="modele_choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
+    difficulte = Label(racine, text="choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
     Facile = Button(boite_widget, text="Facile", fg="white", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Facile.grid(row=1, column=0)
