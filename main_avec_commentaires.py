@@ -20,7 +20,6 @@ case_cliquee -> C'est clairement le même fonctionnement que pour care_colorie
 
 """
 
-
 from tkinter import *
 from random import *
 from copy import deepcopy
@@ -124,9 +123,10 @@ def dessiner_lignes(canva, hauteur):
 nb_vies = 15
 
 # Fonction passerelle 
-def afficher_sauvegarde_effectuee(sauvegarde, fenetre):
+def afficher_sauvegarde_effectuee(sauvegarde, modele_choisi):
     ajouter_sauvegarde(sauvegarde)
-    text = Label(fenetre, text="Sauvegarde effectuée !", bg="white").pack()
+    text = Label(modele_choisi, text="Sauvegarde effectuée !", bg="white")
+    text.pack()
 
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde):
@@ -154,8 +154,6 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
         temps = Label(modele_choisi, text=f"- Chronomètre : {int(time.perf_counter() - debut_chrono)}s", font=("Arial", 15), bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes, int() permet de convertir les secondes float en int pour obtenir un entier
         sauvegarder = Button(modele_choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, modele_choisi),width=25, height=2, bg="grey", fg="white").pack()
         retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey", fg="white" ,command=modele_choisi.destroy).pack(expand=YES)
-
-
 
 care_colorie = None
 # Pour créer les petties cases oranges qui améliore le confort de jeu
@@ -380,14 +378,14 @@ def choix_modele(Niveau):
         case_modele.config(width=255, height=255)
 
     racine.config(bg="white")
-    Choix = Frame(racine, bg="grey")
-    Choix.pack()
+    Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
+    Choix.pack()                    #afficher bordures
     liste_sudoku = []
     #On crée un canvas pour chaque modèle (pour chaque frame)
     for i in range(6):
         boite = Frame(Choix, bg="grey")
         boite.grid(row=i//3, column=i%3, padx=25, pady=25)
-        cases_zoom = Canvas(boite, width=255, height=255, bg="grey", highlightbackground="grey")
+        cases_zoom = Canvas(boite, width=255, height=255, bg="grey", highlightbackground="#dedede")
         cases_zoom.grid(row=0)
         cases_modele = Canvas(boite, width=255, height=255, bg="white", highlightbackground="black")
         cases_modele.grid(row=0)
@@ -405,9 +403,7 @@ def choix_modele(Niveau):
         cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
         cases_zoom.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
         cases_zoom.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
-        cases_modele.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
-        
-                           
+        cases_modele.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))     
 
 def jouer_au_sudoku():
     effacer_widget(racine)
@@ -421,10 +417,8 @@ def jouer_au_sudoku():
     Moyen.grid(row=1, column=1)
     Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    """
     test = Button(boite_widget, text="test", fg="black", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     test.grid(row=1, column=3)
-    """
 
 jouer_au_sudoku()
 
