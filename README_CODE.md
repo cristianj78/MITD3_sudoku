@@ -1,4 +1,4 @@
-##Ce README explique le code contenu dans le fichier "main.py":
+## Ce README explique le code contenu dans le fichier "main.py":
 
 1 : Les modules 
 
