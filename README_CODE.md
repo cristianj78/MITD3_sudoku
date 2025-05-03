@@ -15,7 +15,7 @@ En choisissant l'un des deux, trois difficultés vous seront alors proposées (F
 Ces difficultés se basent sur le nombre de cases vides (Facile: 40, Moyen: 50, Difficile: 60), <ins>notez</ins> qu'il est possible de modifier ces
 nombres de cases vides à tout moment à la fin du programme, veuillez à ne pas **dépasser** le nombre de **60 cases vides**, au-delà, la résolution du sodoku devient ambigüe.
 
-Après avoir choisi la difficulté, il vous est alors possible de choisir parmi une panoplie de modèles au nombre de **6**, avant de choisir le modèle, vous pouvez visiter les différentes
+Après avoir choisi la difficulté, il vous est alors possible de choisir parmi une panoplie de modèles au nombre de <ins>6</ins>, avant de choisir le modèle, vous pouvez visiter les différentes
 options proposées : ouvrir une sauvegarde (Voir (3)), regénérer les modèles si aucun ne vous convient, étudier les règles du sudoku à travers un bouton vous redirigeant vers un site internet,
 changer la difficulté, ou encore un bouton aide qui une fois pressé, active une possible aide dans le modèle choisi.
 
@@ -32,6 +32,6 @@ Si la réponse est validée, le numéro est affiché avec la case coloriée en g
 
 ## 3 : Sauvegardes.
 
-<ins>Json</ins> est utilisé dans ce programme afin de pouvoir permettre la mémorisation des modèles, ces mêmes modèles sont stockés sous forme de **dictionnaires**, lesquels sont eux-même associés à une clé unique
+<ins>Json</ins> est utilisé dans ce programme afin de pouvoir permettre la mémorisation des modèles, ces mêmes modèles sont stockés sous forme de <ins>dictionnaires</ins>, lesquels sont eux-même associés à une clé unique
 (on y retrouve la grille du début, la grille modifiée (par le joueur) ainsi que la grille corrigée qui sont les éléments essentiels pour la sauvegarde), vous pouvez dès lors recommencer un modèle depuis le début, ou
 bien même continuer là où vous vous en êtes arrété, le nombre de sauvegardes maximale est de **9**.
