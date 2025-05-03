@@ -1,4 +1,4 @@
-# explicaqtion du contenu du fichier "main.py":
+# Explication du contenu du fichier "main.py":
 
 ## 1 : Les modules 
 
@@ -32,6 +32,6 @@ Si la réponse est validée, le numéro est affiché avec la case coloriée en g
 
 ## 3 : Sauvegardes.
 
-**Json** est utilisé dans ce programme afin de pouvoir permettre la mémorisation des modèles, ces mêmes modèles sont stockés sous forme de **dictionnaires**, lesquels sont eux-même associés à une clé unique
+<ins>Json</ins> est utilisé dans ce programme afin de pouvoir permettre la mémorisation des modèles, ces mêmes modèles sont stockés sous forme de **dictionnaires**, lesquels sont eux-même associés à une clé unique
 (on y retrouve la grille du début, la grille modifiée (par le joueur) ainsi que la grille corrigée qui sont les éléments essentiels pour la sauvegarde), vous pouvez dès lors recommencer un modèle depuis le début, ou
 bien même continuer là où vous vous en êtes arrété, le nombre de sauvegardes maximale est de **9**.
