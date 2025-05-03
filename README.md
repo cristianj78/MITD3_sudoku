@@ -10,4 +10,4 @@
 
 ## URL de dépot du projet :
 
-<ins>https://github.com/cristianj78/MITD3_sudoku.git</ins>
+https://github.com/cristianj78/MITD3_sudoku.git
