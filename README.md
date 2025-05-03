@@ -1,4 +1,4 @@
-MI TD03 sudoku:
+## MI TD03 sudoku:
 
 -PACE-BAUCHET Raphaël, 22400401
 
@@ -8,6 +8,6 @@ MI TD03 sudoku:
 
 -QUETU Nathan, 22404258
 
-URL de dépot du projet :
+## URL de dépot du projet :
 
-https://github.com/cristianj78/MITD3_sudoku.git
+<ins>https://github.com/cristianj78/MITD3_sudoku.git</ins>
