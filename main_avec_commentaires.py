@@ -30,6 +30,7 @@ racine = Tk()
 racine.config(bg="white")
 racine.geometry("1080x800")
 racine.title("Fenêtre principale")
+racine.resizable(False, False)
 
 # Fonction qui nous sera très utile par la suite
 def effacer_widget(fenetre):
@@ -390,7 +391,7 @@ def choix_modele(Niveau):
     deplacer(u2,descend=False, root=racine)   
 
     Boite_option = Frame(racine)
-    Boite_option.pack(side=TOP, expand=YES)
+    Boite_option.place(x=70, y=540)
     option = Label(Boite_option, text="Options :", fg="black")
     option.pack(side=LEFT)
     Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="white", command=modele_choisir_sauvegarde)
@@ -415,10 +416,10 @@ def choix_modele(Niveau):
 
     racine.config(bg="white")
     Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
-    Choix.pack()                    #afficher bordures
+    Choix.place(x=50, y=200)                 #afficher bordures
     liste_sudoku = []
     #On crée un canvas pour chaque modèle (pour chaque frame)
-    for i in range(6):
+    for i in range(3):
         boite = Frame(Choix, bg="grey")
         boite.grid(row=i//3, column=i%3, padx=25, pady=25)
         cases_zoom = Canvas(boite, width=255, height=255, bg="grey", highlightbackground="#dedede")
