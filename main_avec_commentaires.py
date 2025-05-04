@@ -76,12 +76,39 @@ def remplir_grille(grille):
                 return False  # Retour en arrière
     return True  
 
-def generer_sudoku(): #Position = Dans quel canva
+def a_deuxieme_solution(grille):
+    """ Vérifie s'il existe une deuxième solution pour le sudoku """
+    for ligne in range(9):
+        for col in range(9):
+            if grille[ligne][col] == 0:
+                for num in range(1, 10):
+                    if est_valide(grille, ligne, col, num):
+                        grille[ligne][col] = num
+                        if not remplir_grille(grille):  # Si une deuxième solution est trouvée
+                            return True
+                        grille[ligne][col] = 0  # Retour en arrière
+    return False
+# On sépare les deux fonctions par souci de sauvegarde
+
+def generer_sudoku(): 
     grille = [[0] * 9 for i in range(9)]  
     remplir_grille(grille)
     return grille
 
-# On sépare les deux fonctions par souci de sauvegarde
+def verifier_unicite(grille):
+    """ Vérifie que la grille a une solution unique """
+    copie_grille = [ligne[:] for ligne in grille]  # Copie de la grille
+    if remplir_grille(copie_grille):  # Si une solution est trouvée
+        return not a_deuxieme_solution(copie_grille)  # S'assurer qu'il n'y a pas de deuxième solution
+    return False
+
+def reinitialiser_grille_avec_solution_unique(nb_cases_vides):
+    """Réarrange la grille de manière à garantir qu'elle a une solution unique"""
+    while True: #tant qu'on a pas trouvé, (ça peut être long...)
+        grille = generer_sudoku()
+        grille_vides = creer_cases_vides(grille, nb_cases_vides)
+        if verifier_unicite(grille_vides):
+            return grille_vides  
 
 # Cette fonction nous permet de créer les niveaux de difficulté
 def creer_cases_vides(grille, nb_cases=40):
@@ -157,9 +184,9 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
         nb_vies = nb_vies-1
         affichage_vie.config(text=f"Vies restantes : {nb_vies}")
         if nb_vies <= 0: # Si le joueur a perdu
-            gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
+            gagne_ou_perdu("perdu", modele_choisi, debut_chrono, sauvegarde)
     if grille_corrigee == grille: # Si le joueur a gagné
-        gagne_ou_perdu("perdu", modele_choisi, debut_chrono, sauvegarde)
+        gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
 
 care_colorie = None
 # Pour créer les petties cases oranges qui améliore le confort de jeu
@@ -400,10 +427,11 @@ def choix_modele(Niveau):
         cases_modele.grid(row=0)
         """i//3 permet de placer les trois premiers canvas sur la première ligne avec la division entière, i%3 renvoie le reste 
         et place le canvas sur la colonne souhaitée, padx, pady sont utiles pour les espaces"""
-        a = generer_sudoku()
+        a = reinitialiser_grille_avec_solution_unique(Niveau)
         grille_corrigee = deepcopy(a) #copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
         grille_avec_vide = creer_cases_vides(a, Niveau)
         grille_de_depart = deepcopy(grille_avec_vide)
+        print(verifier_unicite(grille_avec_vide))
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
@@ -420,11 +448,11 @@ def jouer_au_sudoku():
     boite_widget.pack(expand=YES, side=BOTTOM)
     difficulte = Label(racine, text="Choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
-    Facile = Button(boite_widget, text="Facile", fg="black", bg="#dedede", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
+    Facile = Button(boite_widget, text="Facile", fg="black", bg="#dedede", command=lambda:choix_modele(20), width=10, font=("Times", 25), height=3)
     Facile.grid(row=1, column=0)
-    Moyen = Button(boite_widget, text="Moyen", fg="black", bg="#b2b1b1", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
+    Moyen = Button(boite_widget, text="Moyen", fg="black", bg="#b2b1b1", command=lambda:choix_modele(30), width=10, font=("Times", 25), height=3)
     Moyen.grid(row=1, column=1)
-    Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(60), width=10, font=("Times", 25), height=3)
+    Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(35), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
     test = Button(boite_widget, text="test", fg="black", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     test.grid(row=1, column=3)
