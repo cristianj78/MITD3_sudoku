@@ -28,7 +28,7 @@ import webbrowser
 
 racine = Tk()
 racine.config(bg="white")
-racine.geometry("1080x800")
+racine.geometry("1080x600")
 racine.title("Fenêtre principale")
 racine.resizable(False, False)
 
@@ -311,7 +311,7 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
 # Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
 def modele_choisir_sauvegarde():
     sauvegardes = Toplevel(racine)
-    sauvegardes.geometry("650x700")
+    sauvegardes.geometry("650x650")
     sauvegardes.config(bg="white")
     sauvegardes.resizable(False, False)
     sauvegardes.title("Sauvegardes")
@@ -319,22 +319,24 @@ def modele_choisir_sauvegarde():
         donnees = json.load(fichier)
     liste_sudoku = []
     i = 0
+    Choix_sauvegarde = Frame(sauvegardes, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
+    Choix_sauvegarde.pack()
     for modele in donnees:
         grille_de_depart = donnees[modele]["Grille de depart"]
         grille_en_cours = donnees[modele]["Grille en cours"]
         grille_corrigee = donnees[modele]["Grille corrigee"]
         nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
-        boite_sauvegarde = Frame(sauvegardes, bg="white")
-        nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="white", font=("Arial", 15)).grid(row=0, column=0)
+        boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey")
+        nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="grey", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
         a_coche_aide = IntVar()
         option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=a_coche_aide, bg="grey")
         option_aide.grid(row=2, column=1)
-        depuis_debut_chrono = Button(boite_sauvegarde, bg="grey", fg="white", text="Recommencer le modèle depuis le début", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
+        depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut_chrono.grid(row=1, column=0)  
         if grille_en_cours != grille_corrigee:
-            continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
         i += 1
 
@@ -391,7 +393,7 @@ def choix_modele(Niveau):
     deplacer(u2,descend=False, root=racine)   
 
     Boite_option = Frame(racine)
-    Boite_option.place(x=70, y=540)
+    Boite_option.place(x=70, y=470)
     option = Label(Boite_option, text="Options :", fg="black")
     option.pack(side=LEFT)
     Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="white", command=modele_choisir_sauvegarde)
@@ -407,16 +409,18 @@ def choix_modele(Niveau):
     ouvrir_notice.pack(side=RIGHT, padx=20)
 
     def zoom_modele(case_modele, event):
-        case_modele.scale("all", 0, 0, 0.9, 0.9)
         case_modele.config(width=230, height=230)
+        case_modele.scale("all", 0, 0, 0.9, 0.9)
+        
 
     def reset_modele(case_modele, event):
-        case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
         case_modele.config(width=255, height=255)
+        case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
+
 
     racine.config(bg="white")
     Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
-    Choix.place(x=50, y=200)                 #afficher bordures
+    Choix.place(x=50, y=130)                 #afficher bordures
     liste_sudoku = []
     #On crée un canvas pour chaque modèle (pour chaque frame)
     for i in range(3):
