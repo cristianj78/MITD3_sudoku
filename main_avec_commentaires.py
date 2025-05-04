@@ -107,9 +107,10 @@ def reinitialiser_grille_avec_solution_unique(nb_cases_vides):
     """Réarrange la grille de manière à garantir qu'elle a une solution unique"""
     while True: #tant qu'on a pas trouvé, (ça peut être long...)
         grille = generer_sudoku()
+        grille_corrigee = deepcopy(grille)
         grille_vides = creer_cases_vides(grille, nb_cases_vides)
         if verifier_unicite(grille_vides):
-            return grille_vides  
+            return grille_vides, grille_corrigee
 
 # Cette fonction nous permet de créer les niveaux de difficulté
 def creer_cases_vides(grille, nb_cases=40):
@@ -336,7 +337,7 @@ def modele_choisir_sauvegarde():
         depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut_chrono.grid(row=1, column=0)  
         if grille_en_cours != grille_corrigee:
-            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
         i += 1
 
@@ -411,12 +412,10 @@ def choix_modele(Niveau):
     def zoom_modele(case_modele, event):
         case_modele.config(width=230, height=230)
         case_modele.scale("all", 0, 0, 0.9, 0.9)
-        
 
     def reset_modele(case_modele, event):
         case_modele.config(width=255, height=255)
         case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
-
 
     racine.config(bg="white")
     Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
@@ -432,11 +431,10 @@ def choix_modele(Niveau):
         cases_modele.grid(row=0)
         """i//3 permet de placer les trois premiers canvas sur la première ligne avec la division entière, i%3 renvoie le reste 
         et place le canvas sur la colonne souhaitée, padx, pady sont utiles pour les espaces"""
-        a = reinitialiser_grille_avec_solution_unique(Niveau)
-        grille_corrigee = deepcopy(a) #copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
-        grille_avec_vide = creer_cases_vides(a, Niveau)
-        grille_de_depart = deepcopy(grille_avec_vide)
+        grille_avec_vide, grille_corrigee = reinitialiser_grille_avec_solution_unique(Niveau)
+        grille_de_depart = deepcopy(grille_avec_vide) #copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
         print(verifier_unicite(grille_avec_vide))
+        print(grille_avec_vide, grille_corrigee)
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
