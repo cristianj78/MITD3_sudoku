@@ -333,10 +333,10 @@ def modele_choisir_sauvegarde():
         a_coche_aide = IntVar()
         option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=a_coche_aide, bg="grey")
         option_aide.grid(row=2, column=1)
-        depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
+        depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut_chrono.grid(row=1, column=0)  
         if grille_en_cours != grille_corrigee:
-            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
         i += 1
 
