@@ -17,7 +17,6 @@ elle permet le fonctionnement de l'aide visuelle qui affiche le petit carré gri
 souris.
 
 case_cliquee -> C'est clairement le même fonctionnement que pour care_colorie
-
 """
 
 from tkinter import *
@@ -128,6 +127,20 @@ def afficher_sauvegarde_effectuee(sauvegarde, modele_choisi):
     text = Label(modele_choisi, text="Sauvegarde effectuée !", bg="white")
     text.pack()
 
+# Permet d'afficher la victoire à partir des fonctions validation_aide ou verifier_reponse, facilite la compréhension
+def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
+    if choix == "gagné":
+        effacer_widget(modele_choisi)
+        victoire = Label(modele_choisi, text = "Bravo, vous avez gagné !", font=("Arial",21), bg="white").pack(expand=YES)
+        erreurs = Label(modele_choisi, text=f"- Nombres d'erreurs comises : {15 - nb_vies}", font=("Arial", 15), bg="white").pack()
+        temps = Label(modele_choisi, text=f"- Chronomètre : {int(time.perf_counter() - debut_chrono)}s", font=("Arial", 15), bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes, int() permet de convertir les secondes float en int pour obtenir un entier
+        sauvegarder = Button(modele_choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, modele_choisi),width=25, height=2, bg="grey", fg="white").pack()
+        retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey", fg="white" ,command=modele_choisi.destroy).pack(expand=YES)
+    else:
+        effacer_widget(modele_choisi)
+        defaite = Label(modele_choisi, text = "Dommage, vous avez perdu..", font=("Arial",25), bg="white").pack(expand=YES)
+        Retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=modele_choisi.destroy).pack(expand=YES)
+
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde):
     global nb_vies, case_cliquee, nb_erreurs
@@ -144,16 +157,9 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
         nb_vies = nb_vies-1
         affichage_vie.config(text=f"Vies restantes : {nb_vies}")
         if nb_vies <= 0: # Si le joueur a perdu
-            effacer_widget(modele_choisi)
-            defaite = Label(modele_choisi, text = "Dommage, vous avez perdu..", font=("Arial",25), bg="white").pack(expand=YES)
-            Retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=modele_choisi.destroy).pack(expand=YES)
+            gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
     if grille_corrigee == grille: # Si le joueur a gagné
-        effacer_widget(modele_choisi)
-        victoire = Label(modele_choisi, text = "Bravo, vous avez gagné !", font=("Arial",21), bg="white").pack(expand=YES)
-        erreurs = Label(modele_choisi, text=f"- Nombres d'erreurs comises : {15 - nb_vies}", font=("Arial", 15), bg="white").pack()
-        temps = Label(modele_choisi, text=f"- Chronomètre : {int(time.perf_counter() - debut_chrono)}s", font=("Arial", 15), bg='white').pack() #On fait la différence entre la date de fin et celle du début ce qui nous donne le temps en secondes, int() permet de convertir les secondes float en int pour obtenir un entier
-        sauvegarder = Button(modele_choisi, text="Sauvegarder le modèle ?", command=lambda:afficher_sauvegarde_effectuee(sauvegarde, modele_choisi),width=25, height=2, bg="grey", fg="white").pack()
-        retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey", fg="white" ,command=modele_choisi.destroy).pack(expand=YES)
+        gagne_ou_perdu("perdu", modele_choisi, debut_chrono, sauvegarde)
 
 care_colorie = None
 # Pour créer les petties cases oranges qui améliore le confort de jeu
@@ -208,7 +214,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
             Numero.grid(row=2, column=k-1)
 
 # Partie logique de l'aide au joueur (rempli les cases où le numéro modele_choisit apparait).
-def validation_aide(Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry):
+def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
     if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9:
         erreur = Label(Aide, text="Veuillez respecter les contraintes.").pack(side=BOTTOM)
     else:
@@ -219,10 +225,12 @@ def validation_aide(Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entr
                     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3")
                     jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))  
                     jeu.tag_raise("ligne")
+        if grille_corrigee == grille:
+            gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
         Aide.destroy()
     
 
-def aide(jeu, grille_corrigee, grille, modele_choisi):
+def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
     Aide = Toplevel(modele_choisi)
     Aide.geometry("300x75")
     Aide.resizable(False, False)
@@ -230,7 +238,7 @@ def aide(jeu, grille_corrigee, grille, modele_choisi):
     aide_text = Label(Aide, text="choisissez un numéro, il sera révélé là où il apparait").pack(side=TOP)
     aide_entry = Entry(Aide)
     aide_entry.pack()
-    valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry))
+    valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde))
     valider_bouton.pack(side=BOTTOM)
 
 # Fonction créant le sudoku correspondant au modèle modele_choisit, crée la potentielle sauvegarde
@@ -254,7 +262,7 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
     
     menu = Menu(modele_choisi)
     if a_coche_aide.get() == 1: #Si le joueur a coché l'aide 
-        Aide = menu.add_command(label="Aide", command=lambda:aide(jeu, grille_corrigee, grille, modele_choisi))
+        Aide = menu.add_command(label="Aide", command=lambda:aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde))
     Sauvegarder = menu.add_command(label="Sauvegarder", command=lambda:ajouter_sauvegarde(sauvegarde))
     Quitter = menu.add_command(label="Quitter", command=modele_choisi.destroy)
     menu.add_separator()
@@ -297,8 +305,9 @@ def modele_choisir_sauvegarde():
         option_aide.grid(row=2, column=1)
         depuis_debut_chrono = Button(boite_sauvegarde, bg="grey", fg="white", text="Recommencer le modèle depuis le début", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut_chrono.grid(row=1, column=0)  
-        continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
-        continuer.grid(row=2, column=0)   
+        if grille_en_cours != grille_corrigee:
+            continuer = Button(boite_sauvegarde, bg="grey", fg="white", text="Continuer le modèle", command=lambda i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+            continuer.grid(row=2, column=0)   
         i += 1
 
 couleurs = ["black", "green", "blue", "red", "grey", "orange"]
