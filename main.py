@@ -310,7 +310,6 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
 
 def supprimer_sauvegarde(modele, donnees, boite_sauvegarde):
     del donnees[modele]
-    boite_sauvegarde.destroy()
     with open("sauvegardes.json", "w") as f:
         json.dump(donnees, f)  # Il faut mettre à jour le fichier !
     boite_sauvegarde.destroy()
@@ -360,7 +359,7 @@ def choisir_sauvegarde():
                                         modele = modele, donnees = donnees, boite_sauvegarde = boite_sauvegarde :
                                         supprimer_sauvegarde(modele, donnees, boite_sauvegarde))
         supprimer_sauvegarde1.grid(row=3, column=0)
-        
+
         i += 1
 
 couleurs = ["black", "green", "blue", "red", "grey", "orange"]
