@@ -45,7 +45,7 @@ def ajouter_sauvegarde(sauvegarde):
             ajout = json.load(fichier)
         except json.JSONDecodeError: # Si fichier vide
             ajout = {}
-        if len(ajout) > 9: # Nombre sauvegarde maximale
+        if len(ajout) > 7: # Nombre sauvegarde maximale
             print("trop de sauvegardes")
         else:
             ajout[f"sauvegarde{len(ajout)+1}"] = sauvegarde # On crée la nouvelle sauvegarde s'il reste de la place
@@ -308,8 +308,15 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
     jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, nb_vies, affichage_vie, debut_chrono, sauvegarde))
     jeu.bind("<Motion>", lambda event: aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu))
 
+def supprimer_sauvegarde(modele, donnees, boite_sauvegarde):
+    del donnees[modele]
+    boite_sauvegarde.destroy()
+    with open("sauvegardes.json", "w") as f:
+        json.dump(donnees, f)  # Il faut mettre à jour le fichier !
+    boite_sauvegarde.destroy()
+
 # Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
-def modele_choisir_sauvegarde():
+def choisir_sauvegarde():
     sauvegardes = Toplevel(racine)
     sauvegardes.geometry("650x650")
     sauvegardes.config(bg="white")
@@ -327,17 +334,33 @@ def modele_choisir_sauvegarde():
         grille_corrigee = donnees[modele]["Grille corrigee"]
         nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
         boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey")
-        nom = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="grey", font=("Arial", 15)).grid(row=0, column=0)
+        nom_sauvegarde = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="grey", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
         a_coche_aide = IntVar()
         option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=a_coche_aide, bg="grey")
         option_aide.grid(row=2, column=1)
-        depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
-        depuis_debut_chrono.grid(row=1, column=0)  
+        """ Toutes les variables à mettre dans le lambda sont celles qui changent car nous sommes dans une boucle parcourant
+         un dictionnaire ! """
+        depuis_debut = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", 
+                                    command=lambda a_coche_aide = a_coche_aide, 
+                                    i=i, nb_vie_sauvegarde = nb_vie_sauvegarde, 
+                                    grille_corrigee = grille_corrigee, grille_en_cours = grille_en_cours, grille_de_depart = grille_de_depart 
+                                    :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
+        depuis_debut.grid(row=1, column=0)    
+
         if grille_en_cours != grille_corrigee: # Si le joueur a sauvegardé le modèle dans le menu du jeu, cela veut dire qu'il l'a terminé, il doit donc le recommencer depuis le début
-            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+            continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, 
+                               i=i, nb_vie_sauvegarde = nb_vie_sauvegarde,
+                                grille_corrigee = grille_corrigee, grille_en_cours = grille_en_cours, grille_de_depart = grille_de_depart
+                                :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
+
+        supprimer_sauvegarde1 = Button(boite_sauvegarde, bg="white", fg="black", text="Supprimer la sauvegarde", command=lambda 
+                                        modele = modele, donnees = donnees, boite_sauvegarde = boite_sauvegarde :
+                                        supprimer_sauvegarde(modele, donnees, boite_sauvegarde))
+        supprimer_sauvegarde1.grid(row=3, column=0)
+        
         i += 1
 
 couleurs = ["black", "green", "blue", "red", "grey", "orange"]
@@ -396,7 +419,7 @@ def choix_modele(Niveau):
     Boite_option.place(x=70, y=470)
     option = Label(Boite_option, text="Options :", fg="black")
     option.pack(side=LEFT)
-    Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="white", command=modele_choisir_sauvegarde)
+    Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="white", command=choisir_sauvegarde)
     Sasuvegardes.pack(side=LEFT, padx=20)
     regeneration = Button(Boite_option, text="Regénérer les modèles", bg= "white", command=lambda:choix_modele(Niveau))
     regeneration.pack(side=LEFT, padx=20)
