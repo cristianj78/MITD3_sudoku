@@ -34,18 +34,18 @@ racine.resizable(False, False)
 
 # Fonction qui nous sera très utile par la suite
 def effacer_widget(fenetre):
-    for widget in fenetre.winfo_children(): #fenetre.winfo_children() renvoit une liste d'objets correspondant aux widget de la fenetre.
+    for widget in fenetre.winfo_children(): # Fenetre.winfo_children() renvoit une liste d'objets correspondant aux widget de la fenetre.
         widget.destroy()
 
 # On va écrire la sauvegarde dans le fichier json
 def ajouter_sauvegarde(sauvegarde):
-    sauvegarde["Nombre de vie"] = nb_vies #car nb_vies est modifié globalement, on la sauvegarde donc uniquement lorsqu'on appuie sur sauvegarder
+    sauvegarde["Nombre de vie"] = nb_vies # Car nb_vies est modifié globalement, on la sauvegarde donc uniquement lorsqu'on appuie sur sauvegarder
     with open("sauvegardes.json", "r") as fichier:
         try:
             ajout = json.load(fichier)
-        except json.JSONDecodeError: #Si fichier vide
+        except json.JSONDecodeError: # Si fichier vide
             ajout = {}
-        if len(ajout) > 9: #Nombre sauvegarde maximale
+        if len(ajout) > 9: # Nombre sauvegarde maximale
             print("trop de sauvegardes")
         else:
             ajout[f"sauvegarde{len(ajout)+1}"] = sauvegarde # On crée la nouvelle sauvegarde s'il reste de la place
@@ -58,9 +58,9 @@ sudoku = [[] for i in range(9)]
 def est_valide(grille_corrigee, ligne, col, num):
     bloc_x, bloc_y = (ligne // 3) * 3, (col // 3) * 3
     return (
-        num not in grille_corrigee[ligne] and #num n'est ni dans la ligne
-        num not in [grille_corrigee[i][col] for i in range(9)] and #ni dans la colonne
-        num not in [grille_corrigee[i][j] for i in range(bloc_x, bloc_x+3) for j in range(bloc_y, bloc_y+3)]#ni dans le bloc
+        num not in grille_corrigee[ligne] and # Num n'est ni dans la ligne
+        num not in [grille_corrigee[i][col] for i in range(9)] and # Ni dans la colonne
+        num not in [grille_corrigee[i][j] for i in range(bloc_x, bloc_x+3) for j in range(bloc_y, bloc_y+3)]# Ni dans le bloc
     )
 
 # On utilise le backtracking
@@ -71,7 +71,7 @@ def remplir_grille(grille):
                 for num in sample(range(1, 10), 9):  # Mélange des nombres (Pas de shuffle, ça renverrait None)
                     if est_valide(grille, ligne, col, num):
                         grille[ligne][col] = num
-                        if remplir_grille(grille): #appel récursif, tant que la grille n'est pas valide.
+                        if remplir_grille(grille): # Appel récursif, tant que la grille n'est pas valide.
                             return True
                         grille[ligne][col] = 0  # Retour en arrière
                 return False  # Retour en arrière
@@ -105,14 +105,14 @@ def verifier_unicite(grille):
 
 def reinitialiser_grille_avec_solution_unique(nb_cases_vides):
     """Réarrange la grille de manière à garantir qu'elle a une solution unique"""
-    while True: #tant qu'on a pas trouvé, (ça peut être long...)
+    while True: # Tant qu'on a pas trouvé, (ça peut être long...)
         grille = generer_sudoku()
         grille_corrigee = deepcopy(grille)
         grille_vides = creer_cases_vides(grille, nb_cases_vides)
         if verifier_unicite(grille_vides):
             return grille_vides, grille_corrigee
 
-# Cette fonction nous permet de créer les niveaux de difficulté
+# Cette fonction nous permet de créer les niveaux de difficulté selon le nombre de cases restantes
 def creer_cases_vides(grille, nb_cases=40):
     cases = [(i, j) for i in range(9) for j in range(9)]
     shuffle(cases) #mélange les cordonnés des élements de la liste
@@ -173,8 +173,8 @@ def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde):
     global nb_vies, case_cliquee, nb_erreurs
-    if reponse == grille_corrigee[i][j]: #Si le joueur a modele_choisi le bon numéro
-        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") #Les +5, -5 sont de simples ajustements
+    if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
+        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
         jeu.tag_raise("ligne") # à chaque fois qu'on dessine un rectangle, il se superpose sur une des lignes, on "remonte" alors les lignes dans la priorité d'affichage (voir fonction qui dessine les lignes, on se référe aux tags)
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
         grille[i][j] = grille_corrigee[i][j]
@@ -191,7 +191,7 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
         gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
 
 care_colorie = None
-# Pour créer les petties cases oranges qui améliore le confort de jeu
+# Pour créer les petties cases grises qui améliore le confort de jeu
 def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
     global care_colorie
     if care_colorie:
@@ -214,7 +214,7 @@ case_cliquee = None
 
 # Fonction qui affiche le choix des numéros pour la case modele_choisie.
 def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position, nb_vies, affichage_vie, debut_chrono, sauvegarde):
-    global case_cliquee #obligation d'utiliser les variables globales, pour les mises à jour des dessins.
+    global case_cliquee # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
     if case_cliquee:
         jeu.delete(case_cliquee)
     trouvé = False
@@ -224,7 +224,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
             if (x * 55) <= event.x < ((x + 1) * 55) and (y * 55) <= event.y < ((y + 1) * 55):
                 j, i, = x, y
                 print(f"c'est la case {i+1} {j+1}") #test
-                trouvé = True
+                trouvé = True # La case a été trouvée, on break les deux boucles
                 break
         if trouvé:
             break
@@ -232,20 +232,20 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
     jeu.tag_raise("ligne")
     Boite_information = Frame(position)
     Boite_information.grid(row=2, column=0)
-    if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  #On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
+    if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
         effacer = Button(position, text="effacer ce nombre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee))
         effacer.grid(row=7, column=0)
     if grille[i][j] == 0:
-        Choix_numero = Label(position, text=f"choisissez un numéro pour ({i+1}, {j+1})", bg="white") #On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
+        Choix_numero = Label(position, text=f"choisissez un numéro pour ({i+1}, {j+1})", bg="white") # On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
         Choix_numero.grid(row=5, column=0) 
         for k in range(1, 10):
             Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_information, position, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde), width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
 
-# Partie logique de l'aide au joueur (rempli les cases où le numéro modele_choisit apparait).
+# Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
-    if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9:
-        erreur = Label(Aide, text="Veuillez respecter les contraintes.").pack(side=BOTTOM)
+    if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9: 
+        erreur = Label(Aide, text="Veuillez respecter les contraintes.").pack(side=BOTTOM) # Le joueur a entré un chiffre ou nombre invalide
     else:
         for i in range(len(grille_corrigee)):
             for j in range(len(grille_corrigee[0])):
@@ -258,7 +258,7 @@ def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_cho
             gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
         Aide.destroy()
     
-
+# Simple création de la fenêtre d'aide
 def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
     Aide = Toplevel(modele_choisi)
     Aide.geometry("300x75")
@@ -270,13 +270,13 @@ def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
     valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde))
     valider_bouton.pack(side=BOTTOM)
 
-# Fonction créant le sudoku correspondant au modèle modele_choisit, crée la potentielle sauvegarde
+# Fonction créant le sudoku correspondant au modèle choisi, crée la potentielle sauvegarde
 def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_vies_sauvegarde=15):
     """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
     Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
     global nb_vies
     nb_vies = nb_vies_sauvegarde
-    debut_chrono = time.perf_counter() #C'est comme si on actionnait le chrono :)
+    debut_chrono = time.perf_counter() # C'est comme si on actionnait le chrono :)
     modele_choisi = Toplevel(racine)
     modele_choisi.resizable(False, False)
     modele_choisi.geometry("500x650")
@@ -290,7 +290,7 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
                   "Grille corrigee" : grille_corrigee}  
     
     menu = Menu(modele_choisi)
-    if a_coche_aide.get() == 1: #Si le joueur a coché l'aide 
+    if a_coche_aide.get() == 1: # Si le joueur a coché l'aide 
         Aide = menu.add_command(label="Aide", command=lambda:aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde))
     Sauvegarder = menu.add_command(label="Sauvegarder", command=lambda:ajouter_sauvegarde(sauvegarde))
     Quitter = menu.add_command(label="Quitter", command=modele_choisi.destroy)
@@ -308,7 +308,6 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
     jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, nb_vies, affichage_vie, debut_chrono, sauvegarde))
     jeu.bind("<Motion>", lambda event: aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu))
 
-
 # Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
 def modele_choisir_sauvegarde():
     sauvegardes = Toplevel(racine)
@@ -316,8 +315,8 @@ def modele_choisir_sauvegarde():
     sauvegardes.config(bg="white")
     sauvegardes.resizable(False, False)
     sauvegardes.title("Sauvegardes")
-    with open("sauvegardes.json", 'r') as fichier:
-        donnees = json.load(fichier)
+    with open("sauvegardes.json", 'r') as fichier: 
+        donnees = json.load(fichier)  
     liste_sudoku = []
     i = 0
     Choix_sauvegarde = Frame(sauvegardes, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
@@ -336,7 +335,7 @@ def modele_choisir_sauvegarde():
         option_aide.grid(row=2, column=1)
         depuis_debut_chrono = Button(boite_sauvegarde, bg="white", fg="black", text="Recommencer le modèle depuis le début", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut_chrono.grid(row=1, column=0)  
-        if grille_en_cours != grille_corrigee:
+        if grille_en_cours != grille_corrigee: # Si le joueur a sauvegardé le modèle dans le menu du jeu, cela veut dire qu'il l'a terminé, il doit donc le recommencer depuis le début
             continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, i=i, nb_vie_sauvegarde = nb_vie_sauvegarde:nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
         i += 1
@@ -419,9 +418,9 @@ def choix_modele(Niveau):
 
     racine.config(bg="white")
     Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
-    Choix.place(x=50, y=130)                 #afficher bordures
+    Choix.place(x=50, y=130)                 # Afficher bordures
     liste_sudoku = []
-    #On crée un canvas pour chaque modèle (pour chaque frame)
+    # On crée un canvas pour chaque modèle (pour chaque frame)
     for i in range(3):
         boite = Frame(Choix, bg="grey")
         boite.grid(row=i//3, column=i%3, padx=25, pady=25)
@@ -432,14 +431,14 @@ def choix_modele(Niveau):
         """i//3 permet de placer les trois premiers canvas sur la première ligne avec la division entière, i%3 renvoie le reste 
         et place le canvas sur la colonne souhaitée, padx, pady sont utiles pour les espaces"""
         grille_avec_vide, grille_corrigee = reinitialiser_grille_avec_solution_unique(Niveau)
-        grille_de_depart = deepcopy(grille_avec_vide) #copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
+        grille_de_depart = deepcopy(grille_avec_vide) # Copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
         print(verifier_unicite(grille_avec_vide))
         print(grille_avec_vide, grille_corrigee)
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
         choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_corrigee = grille_corrigee, grille_de_depart = grille_de_depart:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide))
-                                                 #Car i change de valeur à chaque itération? on la stock donc.                                  
+                                                 # Car i change de valeur à chaque itération, on la stock donc.                                  
         cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
         cases_zoom.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
         cases_zoom.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
@@ -447,7 +446,7 @@ def choix_modele(Niveau):
 
 def jouer_au_sudoku():
     effacer_widget(racine)
-    boite_widget = Frame(racine) #On l'a recréée parce qu'on vient de la delete
+    boite_widget = Frame(racine)
     boite_widget.pack(expand=YES, side=BOTTOM)
     difficulte = Label(racine, text="Choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
@@ -455,7 +454,7 @@ def jouer_au_sudoku():
     Facile.grid(row=1, column=0)
     Moyen = Button(boite_widget, text="Moyen", fg="black", bg="#b2b1b1", command=lambda:choix_modele(30), width=10, font=("Times", 25), height=3)
     Moyen.grid(row=1, column=1)
-    Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(35), width=10, font=("Times", 25), height=3)
+    Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
     test = Button(boite_widget, text="test", fg="black", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     test.grid(row=1, column=3)
