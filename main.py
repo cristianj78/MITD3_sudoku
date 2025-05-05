@@ -48,7 +48,7 @@ def ajouter_sauvegarde(sauvegarde):
         if len(ajout) > 7: # Nombre sauvegarde maximale
             print("trop de sauvegardes")
         else:
-            ajout[f"sauvegarde{len(ajout)+1}"] = sauvegarde # On crée la nouvelle sauvegarde s'il reste de la place
+            ajout[f"Sauvegarde {len(ajout)+1}"] = sauvegarde # On crée la nouvelle sauvegarde s'il reste de la place
             print(ajout)
             with open("sauvegardes.json", "w") as fich:
                 json.dump(ajout, fich) 
@@ -333,7 +333,7 @@ def choisir_sauvegarde():
         grille_corrigee = donnees[modele]["Grille corrigee"]
         nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
         boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey")
-        nom_sauvegarde = Label(boite_sauvegarde, text=f'Sauvegarde N°{i}', bg="grey", font=("Arial", 15)).grid(row=0, column=0)
+        nom_sauvegarde = Label(boite_sauvegarde, text=str(modele), bg="grey", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
         a_coche_aide = IntVar()
