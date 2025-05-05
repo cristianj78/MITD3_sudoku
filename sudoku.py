@@ -1,29 +1,488 @@
 import tkinter as tk
-import fonctions_gene as fct
+# import fonctions_gene as fct
 import time
 import copy
 import json 
 import os
+import random as rd
+
+sudoku = [
+    [
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+    ],
+    [
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+    ],
+    [
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+        ],
+        [
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ],
+            [
+                0,
+                0,
+                0
+            ]
+        ]
+    ]
+]
+
+bg_color = "#E2EAF4"
+retour = 0
+num_possible = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+num_possible_ephemere = {}
+
+num_fixe = []
+
+def next_number(sudoku_next,a,b,c,d):
+    """Change la valeur de la case parmi les nombres possible, retourne false si aucune sol n'est trouvé, sinon true"""
+    global retour
+    cle = (a, b, c, d)
+    if not retour:
+        liste_possible_ephemere = num_possible.copy()
+        num_possible_ephemere[cle] = num_possible.copy()
+        if sudoku[a][b][c][d] in liste_possible_ephemere:
+            liste_possible_ephemere.remove(sudoku[a][b][c][d])
+        
+        
+    else:
+        if num_possible_ephemere[cle] != "":
+            if sudoku_next[a][b][c][d] in num_possible_ephemere[cle]:
+                num_possible_ephemere[cle].remove(sudoku_next[a][b][c][d])
+            liste_possible_ephemere = num_possible_ephemere[cle]
+
+
+    for j in range(3):
+        for l in range(3):
+            if sudoku_next[a][j][c][l] in liste_possible_ephemere:
+                liste_possible_ephemere.remove(sudoku_next[a][j][c][l])
+
+    for i in range(3):
+        for k in range(3):
+            if sudoku_next[i][b][k][d] in liste_possible_ephemere:
+                liste_possible_ephemere.remove(sudoku_next[i][b][k][d])
+
+    for k in range(3):
+        for l in range(3):
+            if sudoku_next[a][b][k][l] in liste_possible_ephemere:
+                liste_possible_ephemere.remove(sudoku_next[a][b][k][l])
+
+
+    num_possible_ephemere[cle] = liste_possible_ephemere
+    if liste_possible_ephemere != []:
+        num_random = rd.choice(liste_possible_ephemere)
+        sudoku_next[a][b][c][d] = num_random
+        retour = False
+        return True
+    else:
+        retour = True
+        sudoku_next[a][b][c][d] = 0
+        return False
+        
+
+
+
+def generateur():
+    """Genere la grille résolu"""
+    global num_possible_ephemere, sudoku_incomplet
+    i = 0
+    j = 0
+    k = 0
+    l = 0
+    num_possible_ephemere = {}
+    sudoku_complet = copy.deepcopy(sudoku)
+    while i < 3:
+        while j < 3:
+            while k < 3:
+                while l < 3:
+                    next = next_number(sudoku_complet,i,j,k,l)
+                    if next == False:
+                        if l > 0:
+                            l = l-1
+
+                        elif l == 0 and k > 0:
+                            l = 2
+                            k = k-1
+
+                        elif l == 0 and k == 0 and j > 0:
+                            l = 2
+                            k = 2
+                            j = j-1
+
+                        elif l == 0 and k == 0 and j == 0 and i > 0:
+                            l = 2
+                            k = 2
+                            j = 2
+                            i = i-1
+                    else:
+                        if l < 2:
+                            l = l+1
+
+                        elif l == 2 and k < 2:
+                            l = 0
+                            k = k+1
+                            
+                        elif l == 2 and k == 2 and j < 2:
+                            l = 0
+                            k = 0
+                            j = j+1
+                            
+                        elif l == 2 and k == 2 and j == 2 and i < 2:
+                            l = 0
+                            k = 0
+                            j = 0
+                            i = i+1
+                        else:
+                            l = 3
+                            k = 3
+                            j = 3
+                            i = 3
+    sudoku_incomplet = copy.deepcopy(sudoku_complet)
+    return sudoku_complet
+                    
+
+sudoku_incomplet = []
+
+def suppression_solution(difficulte):
+    """Supprime un a un chauqe nombre pour arriver a un sudoku resolvable"""
+    z = 0
+    e = 0
+    r = 0
+    t = 0
+
+    sudoku_complet = generateur()
+
+    if difficulte == "Facile":
+        case_supprimer = 0 + 1
+    elif difficulte == "Normal":
+        case_supprimer = 42+1
+    elif difficulte == "Difficile":
+        case_supprimer = 50+1
+    else:
+        case_supprimer = 55+1
+    
+    for _ in range(case_supprimer):
+        test_solve = False
+        while test_solve == False:
+            z,e,r,t = rd.randint(0,2), rd.randint(0,2), rd.randint(0,2), rd.randint(0,2)
+
+            while sudoku_incomplet[z][e][r][t] == 0:
+                z,e,r,t = rd.randint(0,2), rd.randint(0,2), rd.randint(0,2), rd.randint(0,2)
+            temp = sudoku_incomplet[z][e][r][t]
+            sudoku_incomplet[z][e][r][t] = 0
+                        
+            
+            num_fixe.append((z,e,r,t))
+            sudoku_incomplet2 = copy.deepcopy(sudoku_incomplet)
+            test_solve = solveur(sudoku_incomplet2, sudoku_complet)
+            
+            
+            if test_solve == False:
+                num_fixe.remove((z,e,r,t))
+                sudoku_incomplet[z][e][r][t] = temp
+        test_solve = False
+    return sudoku_incomplet, sudoku_complet
+
+def solveur(sudoku_incomplet, sudoku_complet):
+    """Resous le sudoku pour tester l unicite de la solution"""
+    next = True
+    global num_possible_ephemere, retour
+    i = 0
+    j = 0
+    k = 0
+    l = 0
+    num_possible_ephemere = {}
+
+    while i < 3:
+        while j < 3:
+            while k < 3:
+                while l < 3 and num_fixe != []:
+                    if (i,j,k,l) in num_fixe:
+                        next = next_number(sudoku_incomplet,i,j,k,l)
+                    if next == False:
+                        
+                        if l > 0:
+                            l = l-1
+
+                        elif l == 0 and k > 0:
+                            l = 2
+                            k = k-1
+
+                        elif l == 0 and k == 0 and j > 0:
+                            l = 2
+                            k = 2
+                            j = j-1
+
+                        elif l == 0 and k == 0 and j == 0 and i > 0:
+                            l = 2
+                            k = 2
+                            j = 2
+                            i = i-1
+                        
+                        elif l == 0 and k == 0 and j == 0 and i == 0:
+                            retour = False
+                            return True
+
+                        while (i,j,k,l) in num_fixe:
+                            if l > 0:
+                                l = l-1
+
+                            elif l == 0 and k > 0:
+                                l = 2
+                                k = k-1
+
+                            elif l == 0 and k == 0 and j > 0:
+                                l = 2
+                                k = 2
+                                j = j-1
+
+                            elif l == 0 and k == 0 and j == 0 and i > 0:
+                                l = 2
+                                k = 2
+                                j = 2
+                                i = i-1
+                            
+                            elif l == 0 and k == 0 and j == 0 and i == 0:
+                                retour = False
+                                return True
+                    else:
+                        if l < 2:
+                            l = l+1
+
+                        elif l == 2 and k < 2:
+                            l = 0
+                            k = k+1
+                                
+                        elif l == 2 and k == 2 and j < 2:
+                            l = 0
+                            k = 0
+                            j = j+1
+                                
+                        elif l == 2 and k == 2 and j == 2 and i < 2:
+                            l = 0
+                            k = 0
+                            j = 0
+                            i = i+1
+                        else:
+                            l = 3
+                            k = 3
+                            j = 3
+                            i = 3
+    if sudoku_incomplet == sudoku_complet:
+        return True
+    else:
+        return False
+
+
+
+
+def sudoku_affichage(sudoku):
+    """Affiche le sudoku"""
+    for i in range(3):
+        for j in range(3):
+            for k in range(3):
+                for l in range(3):
+                    print(sudoku[i][k][j][l], end=" ")
+                print(end="  ")
+            print("")
+        print("")
+    print(".........")
+
+
+
+def deplacer(label, descend, root):
+    try:
+        pos = label.place_info()
+    except tk.TclError:
+        return  # Le label n'existe plus, on arrête l'animation
+
+    place_x = int(pos['x'])
+    place_y = int(pos['y'])
+
+    place_y += 1 if descend else -1
+
+    if place_y == 61:
+        descend = False
+    elif not descend and place_y == 0:
+        descend = True
+
+    label.place(x=place_x, y=place_y)
+    root.after(70, lambda: deplacer(label, descend, root))
 
 difficulte = "Normal"
 temps = 0
+
+def recreer_menu(root):
+    global menu
+    menu_creer = tk.Menu(root)
+    menu = menu_creer
+    Accueil = menu.add_command(label="Accueil", command=lambda: (effacer_widget_sans_forget(root), recreer_menu(root), creation_menu()))
+    menu.add_separator()
+    Nouvelle_partie = menu.add_command(label="Nouvelle Partie", command=lambda: (effacer_widget_sans_forget(root), recreer_menu(root), nouvelle_partie()))
+    menu.add_separator()
+    Sauvegarder = menu.add_command(label="Sauvegarder", command=lambda: ajouter_sauvegarde(sudoku_a_completer))
+    menu.add_separator()
+    Quitter = menu.add_command(label="Quitter", command=root.destroy)
 
 def effacer_widget(widget):
     for child in widget.winfo_children():
         child.destroy()
     widget.pack_forget()  # ← Important si tu veux cacher complètement la frame elle-même
 
-
+def effacer_widget_sans_forget(widget):
+    for child in widget.winfo_children():
+        child.destroy()
 
 
 def generation_liste_sudoku():
     global difficulte
     sudoku_liste_choix = []
     sudoku_liste_corrigees = []
-    sudoku1_incomplet, sudoku1_complet = fct.suppression_solution(difficulte)
-    sudoku2_incomplet, sudoku2_complet = fct.suppression_solution(difficulte)
-    sudoku3_incomplet, sudoku3_complet = fct.suppression_solution(difficulte)
-    sudoku4_incomplet, sudoku4_complet = fct.suppression_solution(difficulte)
+    sudoku1_incomplet, sudoku1_complet = suppression_solution(difficulte)
+    sudoku2_incomplet, sudoku2_complet = suppression_solution(difficulte)
+    sudoku3_incomplet, sudoku3_complet = suppression_solution(difficulte)
+    sudoku4_incomplet, sudoku4_complet = suppression_solution(difficulte)
     sudoku_liste_choix.append(sudoku1_incomplet)
     sudoku_liste_choix.append(sudoku2_incomplet)
     sudoku_liste_choix.append(sudoku3_incomplet)
@@ -71,6 +530,7 @@ def dessiner_modeles(frame_modeles, frame_nouvelle_partie, sauvegarde=False):
     global difficulte
     # global root, menu, frame_nouvelle_partie, frame_partie_jouable, frame_partie_jouable, label_time, frame_grille_jouable
     index = 0
+    nombre_de_modeles = 4
     effacer_widget(frame_modeles)
     frame_modeles.pack()
     if not sauvegarde:
@@ -79,8 +539,9 @@ def dessiner_modeles(frame_modeles, frame_nouvelle_partie, sauvegarde=False):
         with open("sauvegardes.json", "r") as fichier:
             try:
                 donnees = json.load(fichier)
-                sudoku_liste_choix = [donnees["sauvegarde1"]]
-                sudoku_liste_corrigees = [None]  # Si tu n'as pas la grille corrigée, adapte ici
+                nombre_de_modeles = len(donnees) //2
+                sudoku_liste_choix = [donnees["sauvegarde1"]["a_completer"]]
+                sudoku_liste_corrigees = [donnees["sauvegarde1"]["a_corriger"]]
                 global vie_restantes
                 vie_restantes = donnees.get("nombre_de_vie1", 3)
             except (json.JSONDecodeError, KeyError):
@@ -96,14 +557,13 @@ def dessiner_modeles(frame_modeles, frame_nouvelle_partie, sauvegarde=False):
     def reset_modele(case_modele, event):
         case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
         case_modele.config(width=206, height=206)
-    for i in range(4):
+    for i in range(nombre_de_modeles):
         boite = tk.Frame(frame_modeles, bg=bg_color)
         boite.grid(row=i//2, column=i%2, padx=25, pady=25)
         canvas_zoom = tk.Canvas(boite, width=206, height=206, bg=bg_color, highlightbackground=bg_color)
         canvas_zoom.grid(row=0)
         cases_modele = tk.Canvas(boite, width=206, height=206, bg="#FFECA1", highlightbackground="black")
         cases_modele.grid(row=0)
-        print("k")
         dessiner_lignes(cases_modele,211)
         dessiner_numeros(cases_modele, 211, 14, i, sudoku_liste_choix)
         cases_modele.bind("<Button-1>", lambda event, ind=index: (effacer_widget(frame_nouvelle_partie), partie_jouable(ind, sudoku_liste_choix, sudoku_liste_corrigees)))
@@ -142,12 +602,12 @@ def creation_menu():
     label6 = tk.Label(frame_label_sudoku, text="u", bg=bg_color, font=("Arial", 60))
     label6.place(x=420, y=20)
 
-    fct.deplacer(label1,descend = True, root=root)
-    fct.deplacer(label2,descend = True, root=root)
-    fct.deplacer(label3,descend = True, root=root)
-    fct.deplacer(label4,descend = True, root=root)
-    fct.deplacer(label5,descend=False, root=root)
-    fct.deplacer(label6,descend=False, root=root)
+    deplacer(label1,descend = True, root=root)
+    deplacer(label2,descend = True, root=root)
+    deplacer(label3,descend = True, root=root)
+    deplacer(label4,descend = True, root=root)
+    deplacer(label5,descend=False, root=root)
+    deplacer(label6,descend=False, root=root)
 
         #BOUTONS
     frame_buttons = tk.Frame(frame_menu, bg=bg_color)
@@ -254,11 +714,9 @@ def changement_nombre(event):
         selectionnment_fleche(event.keysym)
     elif event.char in chr_possible:
         nombre_choisi = None
-        sudoku_a_completer[coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = int(event.char)
-        print("t")
+        sudoku_a_completer["a_completer"][coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = int(event.char)
         if selectionne and valeur == 0 and int(event.char) == correction:
             selectionne.config(text=str(event.char), fg="#7FB3FF")
-            print(liste_boutons_restants)
             liste_boutons_restants.remove(selectionne)
             if liste_boutons_restants == []:
                 ancien_selectionne = None
@@ -274,16 +732,15 @@ def changement_nombre(event):
 
     elif event.char == "0":
         nombre_choisi = None
-        sudoku_a_completer[coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = 0
+        sudoku_a_completer["a_completer"][coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = 0
         if selectionne and valeur == 0:
             selectionne.config(text="", fg="#7FB3FF")
 
 def boutton_changement_nombre(val, effacement=None):
     global nombre_choisi, selectionne, valeur, correction, label_vie_restantes, vie_restantes, liste_boutons_restants, ancien_selectionne, sudoku_a_completer
     nombre_choisi = val
-    print(vie_restantes)
     if not effacement:
-        sudoku_a_completer[coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = nombre_choisi
+        sudoku_a_completer["a_completer"][coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = nombre_choisi
         if selectionne and valeur == 0 and nombre_choisi == correction:
             selectionne.config(text=str(nombre_choisi), fg="#7FB3FF")
             liste_boutons_restants.remove(selectionne)
@@ -300,7 +757,7 @@ def boutton_changement_nombre(val, effacement=None):
                 fin_partie(False)
 
     elif selectionne and valeur == 0:
-            sudoku_a_completer[coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = 0
+            sudoku_a_completer["a_completer"][coordonnee[0]][coordonnee[1]][coordonnee[2]][coordonnee[3]] = 0
             selectionne.config(text=str(nombre_choisi), fg="#7FB3FF")
 
     
@@ -338,9 +795,9 @@ def selectionnment_fleche(key):
 
 frame_partie_jouable = None
 
+
 def ajouter_sauvegarde(sudoku_a_completer):
     global vie_restantes
-    print("re")
     # sudoku_a_completer["Nombre de vie"] = nb_vies #car nb_vies est modifié globalement, on la sauvegarde donc uniquement lorsqu'on appuie sur sauvegarder
     fichier_sauvegarde = "sauvegardestt.json"
     if not os.path.exists(fichier_sauvegarde):
@@ -355,9 +812,11 @@ def ajouter_sauvegarde(sudoku_a_completer):
         if len(ajout) >= 4: #Nombre sauvegarde maximale
             print("trop de sauvegardes")
         else:
-            ajout[f"sauvegarde{len(ajout)+1}"] = sudoku_a_completer # On crée la nouvelle sauvegarde s'il reste de la place
-            ajout[f"nombre_de_vie{len(ajout)+1}"] = vie_restantes
-            print(ajout)
+            longueur = len(ajout)+1
+            ajout[f"sauvegarde{longueur}"] = sudoku_a_completer
+            ajout[f"sauvegarde{longueur}"]["a_completer"] = sudoku_a_completer["a_completer"] # On crée la nouvelle sauvegarde s'il reste de la place
+            ajout[f"sauvegarde{longueur}"]["a_corriger"] = sudoku_a_completer["a_corriger"] # On crée la nouvelle sauvegarde s'il reste de la place
+            ajout[f"nombre_de_vie{longueur}"] = vie_restantes
             with open("sauvegardes.json", "w") as fich:
                 json.dump(ajout, fich) 
 
@@ -406,7 +865,8 @@ def partie_jouable(index, sudoku_liste_choix, sudoku_liste_corrigees):
 
     def generation_sudoku():
         global liste_button_jouable, liste_boutons_restants, sudoku_a_completer
-        sudoku_a_completer = sudoku_liste_choix[index]
+        sudoku_a_completer["a_completer"] = copy.deepcopy(sudoku_liste_choix[index])
+        sudoku_a_completer["a_corriger"] = copy.deepcopy(sudoku_liste_corrigees[index])
         liste_button_jouable = []
         for i in range(3):
             liste_button_jouable.append([])
@@ -443,6 +903,7 @@ def partie_jouable(index, sudoku_liste_choix, sudoku_liste_corrigees):
     frame_grille_jouable.pack(side="left", padx=15)
 
     generation_sudoku()
+    
 
     root.bind("<Key>", lambda event: changement_nombre(event))
 
@@ -506,42 +967,8 @@ def autres_sauvegardes():
     root.config(menu=menu)
     frame_nouvelle_partie = tk.Frame(root)
     frame_nouvelle_partie.pack()
-    
 
-    #     #CHOIX DIFFICULTE
-
-    # frame_difficulte = tk.Frame(frame_nouvelle_partie, bg=bg_color)
-
-    # label_difficulte = tk.Label(frame_difficulte, text="Choisis la difficulté", bg=bg_color, font=("Arial", 13))
-
-    # button_facile = tk.Button(frame_difficulte, text="Facile", font=("Arial", 13), command=lambda: changement_difficulte("Facile", button_facile))
-    # button_normal = tk.Button(frame_difficulte, text="Normal", font=("Arial", 13), state="disabled", command=lambda: changement_difficulte("Normal", button_normal))
-    # button_difficile = tk.Button(frame_difficulte, text="Difficile", font=("Arial", 13), command=lambda: changement_difficulte("Difficile", button_difficile))
-    # button_extreme = tk.Button(frame_difficulte, text="Extreme", font=("Arial", 13), command=lambda: changement_difficulte("Extreme", button_extreme))
     frame_modeles = tk.Frame(frame_nouvelle_partie, bg=bg_color, pady= 10)
-
-    #     # bf,bn,bd,be = None,None,None,None
-    # def changement_difficulte(difficulte_a_changer, button_non_affecte):
-    #     global difficulte
-    #     # global bf,bn,bd,be
-    #     # bf,bn,bd,be = button_facile, button_normal, button_difficile, button_extreme
-    #     difficulte = difficulte_a_changer
-    #     button_facile.config(state="active")
-    #     button_normal.config(state="active")
-    #     button_difficile.config(state="active")
-    #     button_extreme.config(state="active")
-    #     button_non_affecte.config(state="disabled")
-
-
-    #     dessiner_modeles(frame_modeles, frame_nouvelle_partie)
-
-
-    # frame_difficulte.pack(fill="x")
-    # label_difficulte.grid(column=0, row=0)
-    # button_facile.grid(column=1, row=0, padx=3)
-    # button_normal.grid(column=2, row=0, padx=3)
-    # button_difficile.grid(column=3, row=0, padx=3)
-    # button_extreme.grid(column=4, row=0, padx=3)
     frame_modeles.pack(fill="both")
 
     dessiner_modeles(frame_modeles, frame_nouvelle_partie, sauvegarde=True)
@@ -559,7 +986,7 @@ nombre_choisi = None
 
 liste_button_jouable = []
 liste_boutons_restants = []
-sudoku_a_completer = []
+sudoku_a_completer = {}
 
 vie_restantes = 0
 label_vie_restantes = None
@@ -574,7 +1001,10 @@ def selectionnement(label,case,coord,case_corrige):
     if selectionne:
         selectionne.config(bg="#ffcff6")
     if ancien_selectionne and ancien_selectionne != selectionne:
-        ancien_selectionne.config(bg="#FFECA1")
+        try:
+            ancien_selectionne.config(bg="#FFECA1")
+        except tk.TclError:
+            pass  # Le widget a été détruit
     ancien_selectionne = selectionne
 
 
@@ -588,9 +1018,9 @@ root.geometry("600x600")
 root.config(bg=bg_color)
 
 menu = tk.Menu(root)
-Accueil = menu.add_command(label="Accueil")
+Accueil = menu.add_command(label="Accueil", command=lambda: (effacer_widget_sans_forget(root), recreer_menu(root), creation_menu()))
 menu.add_separator()
-Nouvelle_partie = menu.add_command(label="Nouvelle Partie", command=lambda: nouvelle_partie())
+Nouvelle_partie = menu.add_command(label="Nouvelle Partie", command=lambda: (effacer_widget_sans_forget(root), recreer_menu(root), nouvelle_partie()))
 menu.add_separator()
 Sauvegarder = menu.add_command(label="Sauvegarder", command=lambda: ajouter_sauvegarde(sudoku_a_completer))
 menu.add_separator()
