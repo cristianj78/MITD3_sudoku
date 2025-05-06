@@ -210,7 +210,7 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
 
 # Comme son nom l'indique
 def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
-    global effacer
+    global effacer, liste_actions
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
     """Un peu complexe, le cacher ne suffit pas. Comme nous avons attribué un tag "Nombres" à tous les nombres, 
@@ -222,6 +222,10 @@ def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
             jeu.delete(item)
     jeu.tag_raise("ligne")
     effacer.destroy()
+    """en effaçant un nombre, on doit aussi effacer l'action!!"""
+    for x in range(len(liste_actions)):
+        if liste_actions[x][1] == i and liste_actions[x][2] == j:
+            liste_actions.remove(liste_actions[x])
 
 case_cliquee = None
 liste_actions = []
@@ -242,6 +246,7 @@ def retour_en_arriere(jeu):
             jeu.delete(item)
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
     jeu.tag_raise("ligne")
+    print(liste_actions)
 
 retour = None
 effacer = None
