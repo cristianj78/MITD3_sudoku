@@ -128,7 +128,7 @@ def dessiner_numeros(sudoku, position, hauteur, police):
             if sudoku[i][j] != 0:
                 x = hauteur//17
                 y = hauteur//9
-                position.create_text(x + y*j, x+y*i,  text=str(sudoku[i][j]), fill="black", font=("Arial", police))
+                position.create_text(x + y*j, x+y*i,  text=str(sudoku[i][j]), fill="black", font=("Arial", police), tag="Nombres")
     return sudoku
 
 # On crée les lignes 
@@ -171,12 +171,12 @@ def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
         Retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=modele_choisi.destroy).pack(expand=YES)
 
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
-def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde):
+def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
     global nb_vies, case_cliquee, nb_erreurs
     if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
         jeu.tag_raise("ligne") # à chaque fois qu'on dessine un rectangle, il se superpose sur une des lignes, on "remonte" alors les lignes dans la priorité d'affichage (voir fonction qui dessine les lignes, on se référe aux tags)
-        jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
+        jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25), tag="Nombres")
         grille[i][j] = grille_corrigee[i][j]
         jeu.delete(case_cliquee)
     if grille[i][j] == 0: # Si le joueur s'est trompé de numéro
@@ -200,8 +200,10 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
         for y in range(9):
             """exactement le même principe que pour la fonction "cliquer case"""
             if (x * 55) <= event.x < ((x + 1) * 55) and (y * 55) <= event.y < ((y + 1) * 55): 
-                care_colorie = jeu.create_rectangle(55*x, 55*y, 55*(x+1), 55*(y+1), fill="grey")
+                care_colorie = jeu.create_rectangle(55*x, 55*y, 55*(x+1), 55*(y+1), fill="#dadada")
                 jeu.tag_raise("ligne")
+                if grille[y][x] != 0: # Empêche de cacher la case à cause de l'aide visuelle
+                    jeu.tag_raise("Nombres")
 
 # Comme son nom l'indique
 def effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee):
@@ -228,18 +230,18 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
                 break
         if trouvé:
             break
-    case_cliquee = jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="black")
+    case_cliquee = jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="grey")
+    if grille[i][j] != 0:
+        jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
     jeu.tag_raise("ligne")
     Boite_information = Frame(position)
     Boite_information.grid(row=2, column=0)
     if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
         effacer = Button(position, text="effacer ce nombre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee))
         effacer.grid(row=7, column=0)
-    if grille[i][j] == 0:
-        Choix_numero = Label(position, text=f"choisissez un numéro pour ({i+1}, {j+1})", bg="white") # On ne met pas le .grid() directement à la suite, cela renverrai None (causant des problèmes par la suite)
-        Choix_numero.grid(row=5, column=0) 
+    if grille[i][j] == 0: 
         for k in range(1, 10):
-            Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_information, position, i, j, jeu, affichage_vie, debut_chrono, Choix_numero, sauvegarde), width=5, height=2, bg="grey", fg="white")
+            Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_information, position, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
 
 # Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
@@ -332,7 +334,7 @@ def choisir_sauvegarde():
         grille_en_cours = donnees[modele]["Grille en cours"]
         grille_corrigee = donnees[modele]["Grille corrigee"]
         nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
-        boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey")
+        boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey", highlightbackground="white", bd=10)
         nom_sauvegarde = Label(boite_sauvegarde, text=str(modele), bg="grey", font=("Arial", 15)).grid(row=0, column=0)
         liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
@@ -427,7 +429,9 @@ def choix_modele(Niveau):
     option_aide.pack(side=RIGHT, padx=20)
     difficulté_retour = Button(Boite_option, text="Choisir la difficulté", bg= "white", command=jouer_au_sudoku)
     difficulté_retour.pack(side=RIGHT, padx=20)
-    ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", command=lambda:webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debut_chronoants-complets/"))
+    ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", 
+                           command=lambda:
+                           webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debutants-complets/"))
     ouvrir_notice.pack(side=RIGHT, padx=20)
 
     def zoom_modele(case_modele, event):
