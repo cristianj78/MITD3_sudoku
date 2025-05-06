@@ -49,7 +49,6 @@ def ajouter_sauvegarde(sauvegarde):
             print("trop de sauvegardes")
         else:
             ajout[f"Sauvegarde {len(ajout)+1}"] = sauvegarde # On crée la nouvelle sauvegarde s'il reste de la place
-            print(ajout)
             with open("sauvegardes.json", "w") as fich:
                 json.dump(ajout, fich) 
 
@@ -246,7 +245,6 @@ def retour_en_arriere(jeu):
             jeu.delete(item)
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
     jeu.tag_raise("ligne")
-    print(liste_actions)
 
 retour = None
 effacer = None
@@ -262,7 +260,6 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
         for y in range(9):
             if (x * 55) <= event.x < ((x + 1) * 55) and (y * 55) <= event.y < ((y + 1) * 55):
                 j, i, = x, y
-                print(f"c'est la case {i+1} {j+1}") #test
                 trouvé = True # La case a été trouvée, on break les deux boucles
                 break
         if trouvé:
@@ -508,8 +505,6 @@ def choix_modele(Niveau):
         et place le canvas sur la colonne souhaitée, padx, pady sont utiles pour les espaces"""
         grille_avec_vide, grille_corrigee = reinitialiser_grille_avec_solution_unique(Niveau)
         grille_de_depart = deepcopy(grille_avec_vide) # Copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
-        print(verifier_unicite(grille_avec_vide))
-        print(grille_avec_vide, grille_corrigee)
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
         liste_sudoku.append(grille_avec_vide)
@@ -522,7 +517,7 @@ def choix_modele(Niveau):
 
 def jouer_au_sudoku():
     effacer_widget(racine)
-    boite_widget = Frame(racine)
+    boite_widget = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
     boite_widget.pack(expand=YES, side=BOTTOM)
     difficulte = Label(racine, text="Choisissez la difficulté", font=("Times", 35, "bold"), bg="white")
     difficulte.pack(expand=YES, side=TOP)
@@ -532,8 +527,8 @@ def jouer_au_sudoku():
     Moyen.grid(row=1, column=1)
     Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    test = Button(boite_widget, text="test", fg="black", bg="grey", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
-    test.grid(row=1, column=3)
+    Extreme = Button(boite_widget, text="Extrême", fg="#b2b1b1", bg="black", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
+    Extreme.grid(row=1, column=3)
 
 jouer_au_sudoku()
 
