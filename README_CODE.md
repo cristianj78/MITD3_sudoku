@@ -6,7 +6,7 @@
 - **Random** : Pour générer les grilles de Sudoku de façon aléatoire.
 - **Copy** : Car on est en présence de liste de sous-listes (même cas pour les objets).
 - **Json** : Pour implanter le système de sauvegarde des modèles.
-- **time** : Qui va nous servir pour créer le chronomètre.
+- **Time** : Qui va nous servir pour créer le chronomètre.
 - **Webbrowser** : Pas d'une grande importance, sert uniquement pour le bouton qui vous mène vers le sites vous expliquant les règles du Sudoku
 
 ## 2 : Que fait le programme ?
@@ -36,8 +36,7 @@ Une fois le modèle choisi, une deuxième fenêtre s'ouvre, c'est la fenêtre de
   <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20193635.png" alt="Capture d'écran" width="300"/>
 </div>
   
-Sélectionnez à l'aide de la souris la case que vous voulez remplir, vous devrez évidemment choisir un chiffre entre 1 et 9, une réponse fausse entraine la perte d'un point de vie, un petit rectangle rouge de la taille 
-de la case apparaitra pour signaler une erreur, noter que vous disposez un nombre total de 15 vies, entrainant la fin de la partie si toutes les vies sont perdues. 
+Sélectionnez à l'aide de la souris la case que vous voulez remplir, vous devrez évidemment choisir un chiffre entre 1 et 9, une réponse fausse entraine la perte d'un point de vie, un petit rectangle rouge de la taille de la case apparaitra pour signaler une erreur, noter que vous disposez un nombre total de 15 vies, entrainant la fin de la partie si toutes les vies sont perdues. 
 
 <ins>**IMPORTANT**</ins> : Notez qu'une partie perdue **ne permet pas** la sauvegarde du modèle.
 
@@ -54,9 +53,18 @@ Si la réponse est validée, le numéro est affiché avec la case coloriée en g
 
 <ins>Json</ins> est utilisé dans ce programme afin de pouvoir permettre la mémorisation des modèles, ces mêmes modèles sont stockés sous forme de <ins>dictionnaires</ins>, lesquels sont eux-même associés à une clé unique
 (on y retrouve la grille du début, la grille modifiée (par le joueur) ainsi que la grille corrigée qui sont les éléments essentiels pour la sauvegarde), vous pouvez dès lors recommencer un modèle depuis le début, ou
-bien même continuer là où vous vous en êtes arrété, le nombre de sauvegardes maximale est de **9**.
+bien même continuer là où vous vous en êtes arrété, le nombre de sauvegardes maximale est de **7**. Vous avez la possibilité d'en supprimer directement à partir de l'interface graphique.
 
 <div align="center">
   <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20194040.png" alt="Capture d'écran" width="300"/>
 </div>
+
+## 4 Fonctionnalités supplémentaires :
+
+Le programme prend en charge plusieurs fonctionnalités supplémentaires:
+
+- Les cases que vous aurez remplies sont toutes effaçable. (Remarque : les cases pré-remplies ne sont pas effaçables).
+- le programme embarque un système permettant d'effectuer un "retour en arrière" c'est à dire effacer le dernier chiffre entré par le joueur.
+- Une aide vous permettant d'afficher le chiffre entré par l'utilisateur partout où il apparait dans le puzzle.
+
 
