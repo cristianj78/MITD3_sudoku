@@ -172,13 +172,16 @@ def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
 
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
-    global nb_vies, case_cliquee, nb_erreurs
+    global nb_vies, case_cliquee, liste_actions
     if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
         jeu.tag_raise("ligne") # à chaque fois qu'on dessine un rectangle, il se superpose sur une des lignes, on "remonte" alors les lignes dans la priorité d'affichage (voir fonction qui dessine les lignes, on se référe aux tags)
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25), tag="Nombres")
         grille[i][j] = grille_corrigee[i][j]
         jeu.delete(case_cliquee)
+
+        liste_actions.append([grille, i, j])
+
     if grille[i][j] == 0: # Si le joueur s'est trompé de numéro
         jeu.delete(case_cliquee)
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="red") 
@@ -206,17 +209,46 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
                     jeu.tag_raise("Nombres")
 
 # Comme son nom l'indique
-def effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee):
+def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
+    global effacer
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+    """Un peu complexe, le cacher ne suffit pas. Comme nous avons attribué un tag "Nombres" à tous les nombres, 
+    dès qu'on remonte ce tag, les nombres effacés remontent aussi et on les revoit donc, 
+    on doit donc chercher directement l'objet pour réellement le supprimer"""
+    items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
+    for item in items:
+        if jeu.type(item) == 'text':
+            jeu.delete(item)
     jeu.tag_raise("ligne")
     effacer.destroy()
 
 case_cliquee = None
+liste_actions = []
+
+def retour_en_arriere(jeu):
+    global liste_actions, retour, effacer
+    a_enlever = liste_actions.pop()
+    if len(liste_actions) <= 0: # Toutes les actions ont été retirées
+        retour.destroy()
+        retour = None
+        if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
+            effacer.destroy()
+    i, j = a_enlever[1], a_enlever[2]
+    a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
+    items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
+    for item in items:
+        if jeu.type(item) == 'text':
+            jeu.delete(item)
+    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+    jeu.tag_raise("ligne")
+
+retour = None
+effacer = None
 
 # Fonction qui affiche le choix des numéros pour la case modele_choisie.
-def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position, nb_vies, affichage_vie, debut_chrono, sauvegarde):
-    global case_cliquee # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
+def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, nb_vies, affichage_vie, debut_chrono, sauvegarde):
+    global case_cliquee, liste_actions, retour, effacer # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
     if case_cliquee:
         jeu.delete(case_cliquee)
     trouvé = False
@@ -234,15 +266,26 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, position
     if grille[i][j] != 0:
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
     jeu.tag_raise("ligne")
-    Boite_information = Frame(position)
-    Boite_information.grid(row=2, column=0)
+
+    Boite_nombres = Frame(modele_choisi, bg="white")
+    Boite_nombres.grid(row=2, column=0)
+
+    Boite_fonctionnalites = Frame(modele_choisi, bg="white")
+    Boite_fonctionnalites.grid(row=3, column=0)
+
     if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
-        effacer = Button(position, text="effacer ce nombre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, effacer, i, j, grille_de_depart, grille, grille_corrigee))
-        effacer.grid(row=7, column=0)
+        effacer = Button(modele_choisi, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee))
+        effacer.grid(row=4, column=0)
+    else:
+        if effacer: # Pour faire en sorte que le bouton s'efface lorsque le joueur clique sur une case qui elle n'est pas effaçable
+            effacer.destroy()
     if grille[i][j] == 0: 
         for k in range(1, 10):
-            Numero = Button(Boite_information, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_information, position, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
+            Numero = Button(Boite_nombres, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_nombres, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
+    if retour == None and len(liste_actions) >= 1: # Pour que le bouton ne s'affiche que lorsqu'au moins une action est effectuée
+        retour = Button(Boite_fonctionnalites, text="Enlever le dernier chiffre entré", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
+        retour.grid(row=0, column=2)
 
 # Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
@@ -276,7 +319,7 @@ def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
 def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_vies_sauvegarde=15):
     """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
     Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
-    global nb_vies
+    global nb_vies, retour
     nb_vies = nb_vies_sauvegarde
     debut_chrono = time.perf_counter() # C'est comme si on actionnait le chrono :)
     modele_choisi = Toplevel(racine)
@@ -318,6 +361,8 @@ def supprimer_sauvegarde(modele, donnees, boite_sauvegarde):
 
 # Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
 def choisir_sauvegarde():
+    global retour, liste_actions, effacer
+    retour, liste_actions, effacer = None, [], None # On est certain de recommencer une partie de sudoku sans probkème (variable qui serait déjà initialisée par exemple)
     sauvegardes = Toplevel(racine)
     sauvegardes.geometry("650x650")
     sauvegardes.config(bg="white")
@@ -354,7 +399,7 @@ def choisir_sauvegarde():
             continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, 
                                i=i, nb_vie_sauvegarde = nb_vie_sauvegarde,
                                 grille_corrigee = grille_corrigee, grille_en_cours = grille_en_cours, grille_de_depart = grille_de_depart
-                                :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+                                :nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
 
         supprimer_sauvegarde1 = Button(boite_sauvegarde, bg="white", fg="black", text="Supprimer la sauvegarde", command=lambda 
