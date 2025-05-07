@@ -220,37 +220,45 @@ def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
         if jeu.type(item) == 'text':
             jeu.delete(item)
     jeu.tag_raise("ligne")
-    effacer.destroy()
+    if effacer:
+        effacer.destroy()
     """en effaçant un nombre, on doit aussi effacer l'action!!"""
-    for x in range(len(liste_actions)):
-        if liste_actions[x][1] == i and liste_actions[x][2] == j:
-            liste_actions.remove(liste_actions[x])
     if len(liste_actions) <= 0:
-        retour.destroy()
-        retour = None
+        if retour:
+            retour.destroy()
+            retour = None
         if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
-            effacer.destroy()        
+            effacer.destroy()  
+            effacer = None
+    else:
+        try:
+            for x in range(len(liste_actions)):
+                if liste_actions[x][1] == i and liste_actions[x][2] == j:
+                    liste_actions.remove(liste_actions[x])   
+        except IndexError:
+            pass
 
 case_cliquee = None
 liste_actions = []
 
 def retour_en_arriere(jeu):
     global liste_actions, retour, effacer
+    a_enlever = liste_actions.pop()
+    i, j = a_enlever[1], a_enlever[2]
+    a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
+    items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
+    for item in items:
+        if jeu.type(item) == 'text':
+            jeu.delete(item)
+    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+    jeu.tag_raise("ligne")
     if len(liste_actions) <= 0: # Toutes les actions ont été retirées
-        retour.destroy()
-        retour = None
+        if retour:
+            retour.destroy()
+            retour = None
         if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
             effacer.destroy()
-    else:
-        a_enlever = liste_actions.pop()
-        i, j = a_enlever[1], a_enlever[2]
-        a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
-        items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
-        for item in items:
-            if jeu.type(item) == 'text':
-                jeu.delete(item)
-        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
-        jeu.tag_raise("ligne")
+            effacer = None
 
 retour = None
 effacer = None
