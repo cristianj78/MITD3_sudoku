@@ -209,7 +209,7 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
 
 # Comme son nom l'indique
 def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
-    global effacer, liste_actions
+    global effacer, liste_actions, retour
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
     """Un peu complexe, le cacher ne suffit pas. Comme nous avons attribué un tag "Nombres" à tous les nombres, 
@@ -225,26 +225,32 @@ def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
     for x in range(len(liste_actions)):
         if liste_actions[x][1] == i and liste_actions[x][2] == j:
             liste_actions.remove(liste_actions[x])
+    if len(liste_actions) <= 0:
+        retour.destroy()
+        retour = None
+        if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
+            effacer.destroy()        
 
 case_cliquee = None
 liste_actions = []
 
 def retour_en_arriere(jeu):
     global liste_actions, retour, effacer
-    a_enlever = liste_actions.pop()
     if len(liste_actions) <= 0: # Toutes les actions ont été retirées
         retour.destroy()
         retour = None
         if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
             effacer.destroy()
-    i, j = a_enlever[1], a_enlever[2]
-    a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
-    items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
-    for item in items:
-        if jeu.type(item) == 'text':
-            jeu.delete(item)
-    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
-    jeu.tag_raise("ligne")
+    else:
+        a_enlever = liste_actions.pop()
+        i, j = a_enlever[1], a_enlever[2]
+        a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
+        items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
+        for item in items:
+            if jeu.type(item) == 'text':
+                jeu.delete(item)
+        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+        jeu.tag_raise("ligne")
 
 retour = None
 effacer = None
@@ -372,7 +378,6 @@ def choisir_sauvegarde():
     sauvegardes.title("Sauvegardes")
     with open("sauvegardes.json", 'r') as fichier: 
         donnees = json.load(fichier)  
-    liste_sudoku = []
     i = 0
     Choix_sauvegarde = Frame(sauvegardes, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
     Choix_sauvegarde.pack()
@@ -383,7 +388,6 @@ def choisir_sauvegarde():
         nb_vie_sauvegarde = donnees[modele]["Nombre de vie"]
         boite_sauvegarde = Frame(Choix_sauvegarde, bg="grey")
         nom_sauvegarde = Label(boite_sauvegarde, text=str(modele), bg="grey", font=("Arial", 15)).grid(row=0, column=0)
-        liste_sudoku.append(grille_en_cours)
         boite_sauvegarde.grid(row=i//2, column=i%2, padx=25, pady=25)
         a_coche_aide = IntVar()
         option_aide = Checkbutton(boite_sauvegarde, text="Aide", variable=a_coche_aide, bg="grey")
@@ -394,14 +398,14 @@ def choisir_sauvegarde():
                                     command=lambda a_coche_aide = a_coche_aide, 
                                     i=i, nb_vie_sauvegarde = nb_vie_sauvegarde, 
                                     grille_corrigee = grille_corrigee, grille_en_cours = grille_en_cours, grille_de_depart = grille_de_depart 
-                                    :nouveau_jeu(liste_sudoku[i], grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
+                                    :nouveau_jeu(grille_en_cours, grille_corrigee, i+1, grille_de_depart, a_coche_aide, 15)) 
         depuis_debut.grid(row=1, column=0)    
 
         if grille_en_cours != grille_corrigee: # Si le joueur a sauvegardé le modèle dans le menu du jeu, cela veut dire qu'il l'a terminé, il doit donc le recommencer depuis le début
             continuer = Button(boite_sauvegarde, bg="white", fg="black", text="Continuer le modèle", command=lambda a_coche_aide = a_coche_aide, 
                                i=i, nb_vie_sauvegarde = nb_vie_sauvegarde,
                                 grille_corrigee = grille_corrigee, grille_en_cours = grille_en_cours, grille_de_depart = grille_de_depart
-                                :nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide, nb_vie_sauvegarde)) 
+                                :nouveau_jeu(grille_de_depart, grille_corrigee, i+1, grille_en_cours, a_coche_aide, nb_vie_sauvegarde)) 
             continuer.grid(row=2, column=0)   
 
         supprimer_sauvegarde1 = Button(boite_sauvegarde, bg="white", fg="black", text="Supprimer la sauvegarde", command=lambda 
@@ -430,7 +434,6 @@ def deplacer(label, descend, root):
             descend = False
         elif not descend and place_y == 0:
             descend = True
-        place_y 
         label.place(x=place_x, y=place_y)
         root.after(70, lambda: deplacer(label,descend,root))
     except TclError:
@@ -464,19 +467,19 @@ def choix_modele(Niveau):
     deplacer(u2,descend=False, root=racine)   
 
     Boite_option = Frame(racine)
-    Boite_option.place(x=70, y=470)
+    Boite_option.place(x=40, y=470)
     option = Label(Boite_option, text="Options :", fg="black")
     option.pack(side=LEFT)
-    Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="white", command=choisir_sauvegarde)
+    Sasuvegardes = Button(Boite_option, text="Ouvrir une sauvegarde", bg="#dedede", width=20, height=2, command=choisir_sauvegarde)
     Sasuvegardes.pack(side=LEFT, padx=20)
-    regeneration = Button(Boite_option, text="Regénérer les modèles", bg= "white", command=lambda:choix_modele(Niveau))
+    regeneration = Button(Boite_option, width=20, height=2, text="Regénérer les modèles", bg= "#dedede", command=lambda:choix_modele(Niveau))
     regeneration.pack(side=LEFT, padx=20)
     a_coche_aide = IntVar()
-    option_aide = Checkbutton(Boite_option, text="Aide", variable=a_coche_aide, bg="white")
+    option_aide = Checkbutton(Boite_option, text="Aide", variable=a_coche_aide, bg="#dedede")
     option_aide.pack(side=RIGHT, padx=20)
-    difficulté_retour = Button(Boite_option, text="Choisir la difficulté", bg= "white", command=jouer_au_sudoku)
+    difficulté_retour = Button(Boite_option, text="Choisir la difficulté", width=20, height=2, bg= "#dedede", command=jouer_au_sudoku)
     difficulté_retour.pack(side=RIGHT, padx=20)
-    ouvrir_notice = Button(Boite_option, text="(Si vous ne connaissez pas les règles :) )", bg = "white", 
+    ouvrir_notice = Button(Boite_option, width=30, height=2, text="(Si vous ne connaissez pas les règles :) )", bg = "#dedede", 
                            command=lambda:
                            webbrowser.open("https://sudoku.com/fr/comment-jouer/regles-de-sudoku-pour-les-debutants-complets/"))
     ouvrir_notice.pack(side=RIGHT, padx=20)
@@ -492,7 +495,6 @@ def choix_modele(Niveau):
     racine.config(bg="white")
     Choix = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
     Choix.place(x=50, y=130)                 # Afficher bordures
-    liste_sudoku = []
     # On crée un canvas pour chaque modèle (pour chaque frame)
     for i in range(3):
         boite = Frame(Choix, bg="grey")
@@ -507,9 +509,11 @@ def choix_modele(Niveau):
         grille_de_depart = deepcopy(grille_avec_vide) # Copy ou list ne suffit plus, car on est en présence de sous-listes (même cas pour les objets)
         dessiner_numeros(grille_avec_vide, cases_modele, 260, 15)
         dessiner_lignes(cases_modele, 260)
-        liste_sudoku.append(grille_avec_vide)
-        choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_corrigee = grille_corrigee, grille_de_depart = grille_de_depart:nouveau_jeu(grille_de_depart, grille_corrigee, i+1, liste_sudoku[i], a_coche_aide))
-                                                 # Car i change de valeur à chaque itération, on la stock donc.                                  
+        choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_corrigee = grille_corrigee, 
+                                  grille_de_depart = grille_de_depart,
+                                  grille_avec_vide = grille_avec_vide: # On instaure ces paramètres dans le lambda car ces mêmes paramètres changent selon l'indice de la boucle, il faut donc les stockerc. 
+                                  nouveau_jeu(grille_de_depart, grille_corrigee, i+1, grille_avec_vide, a_coche_aide))         
+                                
         cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
         cases_zoom.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))
         cases_zoom.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
