@@ -540,7 +540,7 @@ def jouer_au_sudoku():
     Moyen.grid(row=1, column=1)
     Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    Extreme = Button(boite_widget, text="Extrême", fg="#b2b1b1", bg="black", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
+    Extreme = Button(boite_widget, text="Extrême", fg="#b2b1b1", bg="black", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
     Extreme.grid(row=1, column=3)
 
 jouer_au_sudoku()
