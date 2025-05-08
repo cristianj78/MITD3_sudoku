@@ -1,5 +1,5 @@
 """
-Explication des variables importantes : 
+Explication des variables importantes et variables globales : 
 
 grille_de_depart -> C'est le début de tout modèle, cette grille n'est pas modifiée car
  on l'utilise dans le cas où l'utilisateur veut recommencer un modèle depuis le début.
@@ -17,6 +17,15 @@ elle permet le fonctionnement de l'aide visuelle qui affiche le petit carré gri
 souris.
 
 case_cliquee -> C'est clairement le même fonctionnement que pour care_colorie
+
+retour : C'est le bouton qui permet d'effectuer un retour en arrière, (effacer le dernier chiffre) 
+on doit pouvoir le supprimer dans plusiuers fonctions
+
+effacer = C'est le bouton qui efface un chiffre en particuilier, choisi par le joueur, lui aussi
+doit pouvoir être supprimable dans plusieurs fonctions
+
+liste_ations : C'est en quelque sorte l'historique des chiffres entrés par le joueur, doit être modifiable dans
+plusieurs fonctions.
 """
 
 from tkinter import *
@@ -32,13 +41,21 @@ racine.geometry("1080x600")
 racine.title("Fenêtre principale")
 racine.resizable(False, False)
 
-# Fonction qui nous sera très utile par la suite
+retour = None
+effacer = None
+case_cliquee = None
+care_colorie = None
+
+liste_actions = []
+nb_vies = 15
+
 def effacer_widget(fenetre):
+    """ Fonction qui nous sera très utile par la suite, efface tout le contenu d'une fenêtre"""
     for widget in fenetre.winfo_children(): # Fenetre.winfo_children() renvoit une liste d'objets correspondant aux widget de la fenetre.
         widget.destroy()
 
-# On va écrire la sauvegarde dans le fichier json
 def ajouter_sauvegarde(sauvegarde):
+    """ Ecrit la sauvegarde dans le fichier Json """
     sauvegarde["Nombre de vie"] = nb_vies # Car nb_vies est modifié globalement, on la sauvegarde donc uniquement lorsqu'on appuie sur sauvegarder
     with open("sauvegardes.json", "r") as fichier:
         try:
@@ -111,8 +128,8 @@ def reinitialiser_grille_avec_solution_unique(nb_cases_vides):
         if verifier_unicite(grille_vides):
             return grille_vides, grille_corrigee
 
-# Cette fonction nous permet de créer les niveaux de difficulté selon le nombre de cases restantes
 def creer_cases_vides(grille, nb_cases=40):
+    """ Cette fonction nous permet de créer les niveaux de difficulté selon le nombre de cases restantes"""
     cases = [(i, j) for i in range(9) for j in range(9)]
     shuffle(cases) #mélange les cordonnés des élements de la liste
     for i in range(nb_cases):
@@ -120,8 +137,8 @@ def creer_cases_vides(grille, nb_cases=40):
         grille[ligne][col] = 0   
     return grille
 
-# Pour dessiner les numéros à l'intérieur des cases
 def dessiner_numeros(sudoku, position, hauteur, police):
+    """ Pour dessiner les numéros à l'intérieur des cases """
     for i in range(9):
         for j in range(9):
             if sudoku[i][j] != 0:
@@ -130,10 +147,9 @@ def dessiner_numeros(sudoku, position, hauteur, police):
                 position.create_text(x + y*j, x+y*i,  text=str(sudoku[i][j]), fill="black", font=("Arial", police), tag="Nombres")
     return sudoku
 
-# On crée les lignes 
 def dessiner_lignes(canva, hauteur):
-    """On divise la longueur ou la hauteur (c'est un carré) par 9 (9 cases)"""  
-    x = hauteur//9
+    """ On crée les lignes """
+    x = hauteur//9 # On divise la longueur ou la hauteur (c'est un carré) par 9 (9 cases)
     y = hauteur//3
 # Création de la grille principale
     for i in range(10):  
@@ -147,16 +163,14 @@ def dessiner_lignes(canva, hauteur):
     for j in range(4):    #Ne surtout pas toucher, les "-3" sont des ajustements
         canva.create_line(j * y-3, 0, j * y-3, hauteur, fill="black", width=5, tags="ligne")
 
-nb_vies = 15
-
-# Fonction passerelle 
 def afficher_sauvegarde_effectuee(sauvegarde, modele_choisi):
+    """ Fonction passerelle """
     ajouter_sauvegarde(sauvegarde)
     text = Label(modele_choisi, text="Sauvegarde effectuée !", bg="white")
     text.pack()
 
-# Permet d'afficher la victoire à partir des fonctions validation_aide ou verifier_reponse, facilite la compréhension
 def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
+    """ Permet d'afficher la victoire à partir des fonctions validation_aide ou verifier_reponse, facilite la compréhension"""
     if choix == "gagné":
         effacer_widget(modele_choisi)
         victoire = Label(modele_choisi, text = "Bravo, vous avez gagné !", font=("Arial",21), bg="white").pack(expand=YES)
@@ -169,8 +183,8 @@ def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
         defaite = Label(modele_choisi, text = "Dommage, vous avez perdu..", font=("Arial",25), bg="white").pack(expand=YES)
         Retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=modele_choisi.destroy).pack(expand=YES)
 
-# Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
 def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
+    """ Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle """
     global nb_vies, case_cliquee, liste_actions
     if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
@@ -192,9 +206,8 @@ def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu,
     if grille_corrigee == grille: # Si le joueur a gagné
         gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
 
-care_colorie = None
-# Pour créer les petties cases grises qui améliore le confort de jeu
 def aide_visuelle(event, grille, jeu):
+    """ Pour créer les petties cases grises qui améliore le confort de jeu """
     global care_colorie
     if care_colorie:
         jeu.delete(care_colorie)
@@ -217,8 +230,8 @@ def maj_boutons():
             effacer.destroy()
             effacer = None
 
-# Comme son nom l'indique
 def effacer_nombre(jeu, i, j, grille):
+    """ Comme son nom l'indique"""
     global effacer, liste_actions, retour
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
@@ -242,10 +255,8 @@ def effacer_nombre(jeu, i, j, grille):
             pass
     maj_boutons()
 
-case_cliquee = None
-liste_actions = []
-
 def retour_en_arriere(jeu):
+    """ Effectue un retour en arrière en supprimant le dernier chiffre entré par l'user """
     global liste_actions, retour, effacer
     if len(liste_actions) > 0:
         a_enlever = liste_actions.pop()
@@ -259,11 +270,8 @@ def retour_en_arriere(jeu):
         jeu.tag_raise("ligne")
     maj_boutons()
 
-retour = None
-effacer = None
-
-# Fonction qui affiche le choix des numéros pour la case modele_choisie.
 def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, affichage_vie, debut_chrono, sauvegarde):
+    """Fonction qui affiche le choix des numéros pour la case modele_choisie."""
     global case_cliquee, liste_actions, retour, effacer # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
     if case_cliquee:
         jeu.delete(case_cliquee)
@@ -302,8 +310,8 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
         retour = Button(Boite_fonctionnalites, text="Revenir en arrière", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
         retour.grid(row=0, column=1, padx=20, pady=20)
 
-# Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
+    """ Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait)."""
     global liste_actions
     if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9: # Si l'user entre un float
         erreur = Label(Aide, text="Veuillez respecter les contraintes.").pack(side=BOTTOM) # Le joueur a entré un chiffre ou nombre invalide
@@ -320,8 +328,8 @@ def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_cho
             gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
         Aide.destroy()
     
-# Simple création de la fenêtre d'aide
 def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
+    """ Simple création de la fenêtre d'aide"""
     Aide = Toplevel(modele_choisi)
     Aide.geometry("300x75")
     Aide.resizable(False, False)
@@ -332,11 +340,9 @@ def aide(debut_chrono, jeu, grille_corrigee, grille, modele_choisi, sauvegarde):
     valider_bouton = Button(Aide, text="Valider", command=lambda:validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde))
     valider_bouton.pack(side=BOTTOM)
 
-# Fonction créant le sudoku correspondant au modèle choisi, crée la potentielle sauvegarde
 def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_vies_sauvegarde=15):
-    """On va utiliser les varianles globales, car nb_vies doit pouvoir être modifié par plusiuers fonctions, et son contenu
-    Doit pouvoir être retrouvé à tout moment, on peut donc pour chaque nouveau jeu rénitialiser nb_vies à 3"""
-    global nb_vies, retour
+    """ Fonction créant le sudoku correspondant au modèle choisi, crée la potentielle sauvegarde """
+    global nb_vies, retour             
     nb_vies = nb_vies_sauvegarde
     debut_chrono = time.perf_counter() # C'est comme si on actionnait le chrono :)
     modele_choisi = Toplevel(racine)
@@ -376,8 +382,8 @@ def supprimer_sauvegarde(modele, donnees, boite_sauvegarde):
         json.dump(donnees, f)  # Il faut mettre à jour le fichier !
     boite_sauvegarde.destroy()
 
-# Création de la fenêtre "ouvrir sauvegarde" dans le menu principal
 def choisir_sauvegarde():
+    """ Création de la fenêtre "ouvrir sauvegarde" dans le menu principal """
     global retour, liste_actions, effacer
     retour, liste_actions, effacer = None, [], None # On est certain de recommencer une partie de sudoku sans probkème (variable qui serait déjà initialisée par exemple)
     sauvegardes = Toplevel(racine)
@@ -448,8 +454,8 @@ def deplacer(label, descend, root):
     except TclError:
         return 
 
-# Menu principal du sudoku
 def choix_modele(Niveau):
+    """ Menu principal du sudoku """
     effacer_widget(racine)
 
     frame_animation = Frame(racine, width=300, height=110, bg="white")
@@ -494,10 +500,12 @@ def choix_modele(Niveau):
     ouvrir_notice.pack(side=RIGHT, padx=20)
 
     def zoom_modele(case_modele, event):
+        """ Permet de rétrécir le modèle pour plus d'effet esthétique """
         case_modele.config(width=230, height=230)
         case_modele.scale("all", 0, 0, 0.9, 0.9)
 
     def reset_modele(case_modele, event):
+        """ Fait revenir le modèle dans sa taille initiale lorsque l'user quitte le modèle avec la souris"""
         case_modele.config(width=255, height=255)
         case_modele.scale("all", 0, 0, 1/0.9, 1/0.9)
 
@@ -529,6 +537,7 @@ def choix_modele(Niveau):
         cases_modele.bind("<Leave>", lambda event, case_modele = cases_modele: reset_modele(case_modele, event))     
 
 def jouer_au_sudoku():
+    """ Choix de la difficulté """
     effacer_widget(racine)
     boite_widget = Frame(racine, bg="grey", relief=RAISED, highlightbackground="black", bd=10)
     boite_widget.pack(expand=YES, side=BOTTOM)
