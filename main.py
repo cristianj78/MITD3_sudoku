@@ -170,7 +170,7 @@ def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
         Retour = Button(modele_choisi, text = "Revenir à la sélection des modèles", font=("Arial", 10), width=30, height=3, bg="grey" ,command=modele_choisi.destroy).pack(expand=YES)
 
 # Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle
-def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
+def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
     global nb_vies, case_cliquee, liste_actions
     if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
@@ -194,7 +194,7 @@ def verifier_reponse(reponse, grille_corrigee, grille, boite_information, modele
 
 care_colorie = None
 # Pour créer les petties cases grises qui améliore le confort de jeu
-def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
+def aide_visuelle(event, grille, jeu):
     global care_colorie
     if care_colorie:
         jeu.delete(care_colorie)
@@ -207,8 +207,18 @@ def aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu):
                 if grille[y][x] != 0: # Empêche de cacher la case à cause de l'aide visuelle
                     jeu.tag_raise("Nombres")
 
+def maj_boutons():
+    global retour, effacer, liste_actions
+    if len(liste_actions) == 0:
+        if retour:
+            retour.destroy()
+            retour = None
+        if effacer:
+            effacer.destroy()
+            effacer = None
+
 # Comme son nom l'indique
-def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
+def effacer_nombre(jeu, i, j, grille):
     global effacer, liste_actions, retour
     grille[i][j] = 0
     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
@@ -223,48 +233,37 @@ def effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee):
     if effacer:
         effacer.destroy()
     """en effaçant un nombre, on doit aussi effacer l'action!!"""
-    if len(liste_actions) <= 0:
-        if retour:
-            retour.destroy()
-            retour = None
-        if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
-            effacer.destroy()  
-            effacer = None
-    else:
+    if len(liste_actions) > 0:
         try:
             for x in range(len(liste_actions)):
                 if liste_actions[x][1] == i and liste_actions[x][2] == j:
                     liste_actions.remove(liste_actions[x])   
         except IndexError:
             pass
+    maj_boutons()
 
 case_cliquee = None
 liste_actions = []
 
 def retour_en_arriere(jeu):
     global liste_actions, retour, effacer
-    a_enlever = liste_actions.pop()
-    i, j = a_enlever[1], a_enlever[2]
-    a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
-    items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
-    for item in items:
-        if jeu.type(item) == 'text':
-            jeu.delete(item)
-    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
-    jeu.tag_raise("ligne")
-    if len(liste_actions) <= 0: # Toutes les actions ont été retirées
-        if retour:
-            retour.destroy()
-            retour = None
-        if effacer: # Au cas où le joueur a appuyé sur une case a effacer et appuie sur retourner en arrière
-            effacer.destroy()
-            effacer = None
+    if len(liste_actions) > 0:
+        a_enlever = liste_actions.pop()
+        i, j = a_enlever[1], a_enlever[2]
+        a_enlever[0][i][j] = 0 # a_enlever[0] -> grille
+        items = jeu.find_overlapping(28 + 55*j, 30 + 55*i, 28 + 55*j, 30 + 55*i) #Trouve tous les objets se trouvant dans cet interval de cordonnés
+        for item in items:
+            if jeu.type(item) == 'text':
+                jeu.delete(item)
+        jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
+        jeu.tag_raise("ligne")
+    maj_boutons()
 
 retour = None
 effacer = None
 
 # Fonction qui affiche le choix des numéros pour la case modele_choisie.
-def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, nb_vies, affichage_vie, debut_chrono, sauvegarde):
+def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, affichage_vie, debut_chrono, sauvegarde):
     global case_cliquee, liste_actions, retour, effacer # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
     if case_cliquee:
         jeu.delete(case_cliquee)
@@ -290,31 +289,33 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
     Boite_fonctionnalites.grid(row=3, column=0)
 
     if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
-        effacer = Button(modele_choisi, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille_de_depart, grille, grille_corrigee))
+        effacer = Button(modele_choisi, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
         effacer.grid(row=4, column=0)
     else:
         if effacer: # Pour faire en sorte que le bouton s'efface lorsque le joueur clique sur une case qui elle n'est pas effaçable
             effacer.destroy()
     if grille[i][j] == 0: 
         for k in range(1, 10):
-            Numero = Button(Boite_nombres, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, Boite_nombres, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
+            Numero = Button(Boite_nombres, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
-    if retour == None and len(liste_actions) >= 1: # Pour que le bouton ne s'affiche que lorsqu'au moins une action est effectuée
+    if len(liste_actions) >= 1: # Pour que le bouton ne s'affiche que lorsqu'au moins une action est effectuée
         retour = Button(Boite_fonctionnalites, text="Enlever le dernier chiffre entré", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
         retour.grid(row=0, column=2)
 
 # Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
-    if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9: 
+    global liste_actions
+    if int(aide_entry.get()) < 1 or int(aide_entry.get()) > 9: # Si l'user entre un float
         erreur = Label(Aide, text="Veuillez respecter les contraintes.").pack(side=BOTTOM) # Le joueur a entré un chiffre ou nombre invalide
     else:
         for i in range(len(grille_corrigee)):
             for j in range(len(grille_corrigee[0])):
-                if grille_corrigee[i][j] == int(aide_entry.get()):
+                if grille_corrigee[i][j] == int(aide_entry.get()) and grille[i][j] == 0: # La case n'est pas préremplie et elle correspond au chiffre:
                     grille[i][j] = grille_corrigee[i][j]
                     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3")
                     jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))  
                     jeu.tag_raise("ligne")
+                    liste_actions.append([grille, i, j])
         if grille_corrigee == grille:
             gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
         Aide.destroy()
@@ -366,8 +367,8 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
     jeu.grid(row=0)
     dessiner_lignes(jeu, 500)
     dessiner_numeros(grille, jeu, 500, 25)
-    jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, nb_vies, affichage_vie, debut_chrono, sauvegarde))
-    jeu.bind("<Motion>", lambda event: aide_visuelle(event, grille_de_depart, grille_corrigee, grille, jeu))
+    jeu.bind("<Button-1>", lambda event :cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, affichage_vie, debut_chrono, sauvegarde))
+    jeu.bind("<Motion>", lambda event: aide_visuelle(event, grille, jeu))
 
 def supprimer_sauvegarde(modele, donnees, boite_sauvegarde):
     del donnees[modele]
@@ -539,7 +540,7 @@ def jouer_au_sudoku():
     Moyen.grid(row=1, column=1)
     Difficile = Button(boite_widget, text="Difficile", fg="black", bg="grey", command=lambda:choix_modele(40), width=10, font=("Times", 25), height=3)
     Difficile.grid(row=1, column=2)
-    Extreme = Button(boite_widget, text="Extrême", fg="#b2b1b1", bg="black", command=lambda:choix_modele(50), width=10, font=("Times", 25), height=3)
+    Extreme = Button(boite_widget, text="Extrême", fg="#b2b1b1", bg="black", command=lambda:choix_modele(1), width=10, font=("Times", 25), height=3)
     Extreme.grid(row=1, column=3)
 
 jouer_au_sudoku()
