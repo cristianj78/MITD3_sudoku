@@ -297,8 +297,8 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
     Boite_fonctionnalites.grid(row=3, column=0)
 
     if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
-        effacer = Button(Boite_fonctionnalites, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
-        effacer.grid(row=0, column=0, padx=20, pady=20)
+        effacer = Button(modele_choisi, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
+        effacer.grid(row=4, column=0)
     else:
         if effacer: # Pour faire en sorte que le bouton s'efface lorsque le joueur clique sur une case qui elle n'est pas effaçable
             effacer.destroy()
@@ -308,7 +308,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
             Numero.grid(row=2, column=k-1)
     if len(liste_actions) >= 1: # Pour que le bouton ne s'affiche que lorsqu'au moins une action est effectuée
         retour = Button(Boite_fonctionnalites, text="Revenir en arrière", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
-        retour.grid(row=0, column=1, padx=20, pady=20)
+        retour.grid(row=0, column=2)
 
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
     """ Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait)."""
