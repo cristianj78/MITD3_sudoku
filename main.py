@@ -257,8 +257,9 @@ def effacer_nombre(jeu, i, j, grille):
         else:
             liste_actions.pop()
         print(len(liste_actions))
-    effacer.destroy()
-    effacer = None
+    if effacer:
+        effacer.destroy()
+        effacer = None
 
 def retour_en_arriere(jeu):
     """ Effectue un retour en arrière en supprimant le dernier chiffre entré par l'user """
@@ -297,7 +298,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
     Boite_nombres = Frame(modele_choisi, bg="white")
     Boite_nombres.grid(row=2, column=0)
 
-    if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
+    if grille_de_depart[i][j] == 0 and grille[i][j] != 0 and effacer == None:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
         effacer = Button(Boite_fonctionnalites, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
         effacer.grid(row=0, column=0, padx=20, pady=20)
     else:
