@@ -289,8 +289,8 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
     Boite_fonctionnalites.grid(row=3, column=0)
 
     if grille_de_depart[i][j] == 0 and grille[i][j] != 0:  # On vérifie que la case a été remplie par le joueur ET que cette même case n'était pas pré-remplie.
-        effacer = Button(modele_choisi, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
-        effacer.grid(row=4, column=0)
+        effacer = Button(Boite_fonctionnalites, text="Effacer ce chiffre", bg="grey", fg="white", command=lambda:effacer_nombre(jeu, i, j, grille))
+        effacer.grid(row=0, column=0, padx=20, pady=20)
     else:
         if effacer: # Pour faire en sorte que le bouton s'efface lorsque le joueur clique sur une case qui elle n'est pas effaçable
             effacer.destroy()
@@ -299,8 +299,8 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
             Numero = Button(Boite_nombres, text=str(k), command=lambda k=k :verifier_reponse(k, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde), width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
     if len(liste_actions) >= 1: # Pour que le bouton ne s'affiche que lorsqu'au moins une action est effectuée
-        retour = Button(Boite_fonctionnalites, text="Enlever le dernier chiffre entré", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
-        retour.grid(row=0, column=2)
+        retour = Button(Boite_fonctionnalites, text="Revenir en arrière", command=lambda : retour_en_arriere(jeu), bg="grey", fg="white")
+        retour.grid(row=0, column=1, padx=20, pady=20)
 
 # Partie logique de l'aide au joueur (rempli les cases où le numéro choisi apparait).
 def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_choisi, aide_entry, sauvegarde):
@@ -313,7 +313,7 @@ def validation_aide(debut_chrono, Aide, jeu, grille_corrigee, grille, modele_cho
                 if grille_corrigee[i][j] == int(aide_entry.get()) and grille[i][j] == 0: # La case n'est pas préremplie et elle correspond au chiffre:
                     grille[i][j] = grille_corrigee[i][j]
                     jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3")
-                    jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))  
+                    jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25), tag="Nombres")  
                     jeu.tag_raise("ligne")
                     liste_actions.append([grille, i, j])
         if grille_corrigee == grille:
@@ -520,7 +520,7 @@ def choix_modele(Niveau):
         dessiner_lignes(cases_modele, 260)
         choix = cases_modele.bind("<Button-1>", lambda event, i=i, grille_corrigee = grille_corrigee, 
                                   grille_de_depart = grille_de_depart,
-                                  grille_avec_vide = grille_avec_vide: # On instaure ces paramètres dans le lambda car ces mêmes paramètres changent selon l'indice de la boucle, il faut donc les stockerc. 
+                                  grille_avec_vide = grille_avec_vide: # On instaure ces paramètres dans le lambda car ces mêmes paramètres changent selon l'indice de la boucle, il faut donc les stocker. 
                                   nouveau_jeu(grille_de_depart, grille_corrigee, i+1, grille_avec_vide, a_coche_aide))         
                                 
         cases_modele.bind("<Enter>", lambda event, case_modele = cases_modele: zoom_modele(case_modele, event))
