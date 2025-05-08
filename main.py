@@ -229,13 +229,6 @@ def aide_visuelle(event, grille, jeu):
                 if grille[y][x] != 0: # Empêche de cacher la case à cause de l'aide visuelle
                     jeu.tag_raise("Nombres")
 
-def maj_boutons():
-    global retour, effacer, liste_actions
-    if len(liste_actions) <= 0:
-        if effacer:
-            effacer.destroy()
-            effacer = None
-
 def effacer_nombre(jeu, i, j, grille):
     """ Comme son nom l'indique"""
     global effacer, liste_actions, retour
@@ -251,12 +244,10 @@ def effacer_nombre(jeu, i, j, grille):
                 jeu.delete(item)
         jeu.tag_raise("ligne")
         """en effaçant un nombre, on doit aussi effacer l'action!!"""
-        print(len(liste_actions))
         if len(liste_actions) > 1:
             liste_actions = [action for action in liste_actions if not (action[1] == i and action[2] == j)]
         else:
             liste_actions.pop()
-        print(len(liste_actions))
     if effacer:
         effacer.destroy()
         effacer = None
