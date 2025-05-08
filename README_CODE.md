@@ -13,7 +13,7 @@
 
 En choisissant l'un des deux, trois difficultés vous seront alors proposées (Facile, Moyen, Difficile)
 <div align="center">
-  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20193457.png" alt="Capture d'écran" width="600"/>
+  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/autres/Choix_difficulte.png" alt="Capture d'écran" width="600"/>
 </div>
 
 
@@ -24,7 +24,7 @@ nombres de cases vides à tout moment à la fin du programme, veuillez à ne pas
 Après avoir choisi la difficulté, il vous est alors possible de choisir parmi une panoplie de modèles au nombre de <ins>6</ins>.
 
 <div align="center">
-  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20193545.png" alt="Capture d'écran" width="600"/>
+  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/autres/menu_principale.png" alt="Capture d'écran" width="600"/>
 </div>
 
 Avant de choisir le modèle, vous pouvez visiter les différentes options proposées : ouvrir une sauvegarde (Voir (3)), regénérer les modèles si aucun ne vous convient, étudier les règles du sudoku à travers un bouton vous redirigeant vers un site internet,
@@ -33,7 +33,7 @@ changer la difficulté, ou encore un bouton aide qui une fois pressé, active un
 Une fois le modèle choisi, une deuxième fenêtre s'ouvre, c'est la fenêtre de jeu, vous pouvez alors commencer à jouer.
 
 <div align="center">
-  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20193635.png" alt="Capture d'écran" width="300"/>
+  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/autres/interface_jeu.png" alt="Capture d'écran" width="300"/>
 </div>
   
 Sélectionnez à l'aide de la souris la case que vous voulez remplir, vous devrez évidemment choisir un chiffre entre 1 et 9, une réponse fausse entraine la perte d'un point de vie, un petit rectangle rouge de la taille de la case apparaitra pour signaler une erreur, noter que vous disposez un nombre total de 15 vies, entrainant la fin de la partie si toutes les vies sont perdues. 
@@ -42,10 +42,6 @@ Sélectionnez à l'aide de la souris la case que vous voulez remplir, vous devre
 
 Si la réponse est validée, le numéro est affiché avec la case coloriée en gris vous indiquant que ce numéro est effaçable (car la case n'a pas été préremplie). Lorsque vous avez gagné 
 (c'est à dire lorsque que toutes les cases ont été remplies), plusieurs statistiques seront affichées à l'écran telles que le temps mis pour résoudre ke sudoku, ainsi que le nombre d'erreurs comises.
-
-<div align="center">
-  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20193714.png" alt="Capture d'écran" width="300"/>
-</div>
 
 <ins>IMPORTANT</ins> : En cas de partie gagnée, vous avez cette fois la **possibilité** de sauvegarder le modèle.
 
@@ -56,7 +52,7 @@ Si la réponse est validée, le numéro est affiché avec la case coloriée en g
 bien même continuer là où vous vous en êtes arrété, le nombre de sauvegardes maximale est de **7**. Vous avez la possibilité d'en supprimer directement à partir de l'interface graphique.
 
 <div align="center">
-  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/images/Capture%20d%E2%80%99%C3%A9cran%202025-05-03%20194040.png" alt="Capture d'écran" width="300"/>
+  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/autres/sauvegardes.png" alt="Capture d'écran" width="300"/>
 </div>
 
 ## 4 Fonctionnalités supplémentaires :
@@ -65,6 +61,11 @@ Le programme prend en charge plusieurs fonctionnalités supplémentaires:
 
 - Les cases que vous aurez remplies sont toutes effaçable. (Remarque : les cases pré-remplies ne sont pas effaçables).
 - le programme embarque un système permettant d'effectuer un "retour en arrière" c'est à dire effacer le dernier chiffre entré par le joueur.
+
+<div align="center">
+  <img src="https://github.com/cristianj78/MITD3_sudoku/blob/main/autres/fonctions_supplementaires.png" alt="Capture d'écran" width="300"/>
+</div>
+
 - Une aide vous permettant d'afficher le chiffre entré par l'utilisateur partout où il apparait dans le puzzle.
 
 
