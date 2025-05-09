@@ -320,28 +320,6 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
                              width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
 
-def montrer_conflits(i, j, valeur, grille, jeu, grille_de_depart):
-    """Colorie en rouge les cases en conflit avec la valeur donnée à la position (i, j). (évidemment si le joueur a
-    entré une mauvaise réponse.)"""
-    jeu.delete("conflit") # Eviter une surcharge des carrés conflits
-    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
-    jeu.tag_raise("Nombres")
-    for col in range(9): # Pour les colones 
-        if col != j and grille[i][col] == valeur and grille_de_depart[i][j] == 0:
-            jeu.create_rectangle(55*col, 55*i, 55*(col+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
-            jeu.tag_raise("Nombres")
-    for row in range(9): # Pour les lignes
-        if row != i and grille[row][j] == valeur and grille_de_depart[i][j] == 0:
-            jeu.create_rectangle(55*j, 55*row, 55*(j+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
-            jeu.tag_raise("Nombres")
-    bloc_i, bloc_j = 3 * (i // 3), 3 * (j // 3)
-    for row in range(bloc_i, bloc_i + 3): # Pour les blocs
-        for col in range(bloc_j, bloc_j + 3):
-            if (row != i or col != j) and grille[row][col] == valeur:
-                jeu.create_rectangle(55*col, 55*row, 55*(col+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
-                jeu.tag_raise("Nombres")
-    jeu.tag_raise("ligne")
-
 def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde, grille_de_depart):
     """ Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle """
     global nb_vies, case_cliquee, liste_actions
@@ -367,6 +345,28 @@ def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu,
             gagne_ou_perdu("perdu", modele_choisi, debut_chrono, sauvegarde)
     if grille_corrigee == grille: # Si le joueur a gagné
         gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
+
+def montrer_conflits(i, j, valeur, grille, jeu, grille_de_depart):
+    """Colorie en rouge les cases en conflit avec la valeur donnée à la position (i, j). (évidemment si le joueur a
+    entré une mauvaise réponse.)"""
+    jeu.delete("conflit") # Eviter une surcharge des carrés conflits
+    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+    jeu.tag_raise("Nombres")
+    for col in range(9): # Pour les colones 
+        if col != j and grille[i][col] == valeur and grille_de_depart[i][j] == 0:
+            jeu.create_rectangle(55*col, 55*i, 55*(col+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+            jeu.tag_raise("Nombres")
+    for row in range(9): # Pour les lignes
+        if row != i and grille[row][j] == valeur and grille_de_depart[i][j] == 0:
+            jeu.create_rectangle(55*j, 55*row, 55*(j+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+            jeu.tag_raise("Nombres")
+    bloc_i, bloc_j = 3 * (i // 3), 3 * (j // 3)
+    for row in range(bloc_i, bloc_i + 3): # Pour les blocs
+        for col in range(bloc_j, bloc_j + 3):
+            if (row != i or col != j) and grille[row][col] == valeur:
+                jeu.create_rectangle(55*col, 55*row, 55*(col+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+                jeu.tag_raise("Nombres")
+    jeu.tag_raise("ligne")
 
 def gagne_ou_perdu(choix, modele_choisi, debut_chrono, sauvegarde):
     """ Permet d'afficher la victoire ou la défaite à partir des fonctions validation_aide ou verifier_reponse, facilite la compréhension"""
