@@ -346,12 +346,18 @@ def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu,
     if grille_corrigee == grille: # Si le joueur a gagné
         gagne_ou_perdu("gagné", modele_choisi, debut_chrono, sauvegarde)
 
+def rearranger_liste(i, j): 
+    """ Fonction très importante ! L'utilisateur peut valider plusieurs fois la même réponse,
+        ce qui va surcharger la liste, on fait donc en sorte qu'elle ne contiennent que des éléments uniques !"""
+    global liste_actions
+    for x in range(len(liste_actions)-1):
+        if liste_actions[x][1] == i and liste_actions[x][2] == j:
+            liste_actions.remove(liste_actions[x])  
+
 def montrer_conflits(i, j, valeur, grille, jeu, grille_de_depart):
     """Colorie en rouge les cases en conflit avec la valeur donnée à la position (i, j). (évidemment si le joueur a
     entré une mauvaise réponse.)"""
     jeu.delete("conflit") # Eviter une surcharge des carrés conflits
-    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
-    jeu.tag_raise("Nombres")
     for col in range(9): # Pour les colones 
         if col != j and grille[i][col] == valeur and grille_de_depart[i][j] == 0:
             jeu.create_rectangle(55*col, 55*i, 55*(col+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
@@ -464,14 +470,6 @@ def retour_en_arriere(jeu):
                 jeu.delete(item)
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="white", outline = "white")
         jeu.tag_raise("ligne")
-
-def rearranger_liste(i, j): 
-    """ Fonction très importante ! L'utilisateur peut valider plusieurs fois la même réponse,
-        ce qui va surcharger la liste, on fait donc en sorte qu'elle ne contiennent que des éléments uniques !"""
-    global liste_actions
-    for x in range(len(liste_actions)-1):
-        if liste_actions[x][1] == i and liste_actions[x][2] == j:
-            liste_actions.remove(liste_actions[x])  
     
 ##################
 # Menu principal #
