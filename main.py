@@ -284,6 +284,7 @@ def nouveau_jeu(grille_de_depart, grille_corrigee, i, grille, a_coche_aide, nb_v
 def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_choisi, affichage_vie, debut_chrono, sauvegarde, Boite_fonctionnalites):
     """Fonction qui affiche le choix des numéros pour la case modele_choisie."""
     global case_cliquee, liste_actions, retour, effacer # Obligation d'utiliser les variables globales, pour les mises à jour des dessins.
+    jeu.delete("conflit") # On delete les cases en conflit à chaque clic
     if case_cliquee:
         jeu.delete(case_cliquee)
     trouvé = False
@@ -315,14 +316,37 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
         for k in range(1, 10):
             Numero = Button(Boite_nombres, text=str(k), command=lambda k=k
                              :verifier_reponse(k, grille_corrigee, grille, modele_choisi, 
-                             i, j, jeu, affichage_vie, debut_chrono, sauvegarde),
+                             i, j, jeu, affichage_vie, debut_chrono, sauvegarde, grille_de_depart),
                              width=5, height=2, bg="grey", fg="white")
             Numero.grid(row=2, column=k-1)
 
-def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde):
+def montrer_conflits(i, j, valeur, grille, jeu, grille_de_depart):
+    """Colorie en rouge les cases en conflit avec la valeur donnée à la position (i, j). (évidemment si le joueur a
+    entré une mauvaise réponse.)"""
+    jeu.delete("conflit") # Eviter une surcharge des carrés conflits
+    jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+    jeu.tag_raise("Nombres")
+    for col in range(9): # Pour les colones 
+        if col != j and grille[i][col] == valeur and grille_de_depart[i][j] == 0:
+            jeu.create_rectangle(55*col, 55*i, 55*(col+1), 55*(i+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+            jeu.tag_raise("Nombres")
+    for row in range(9): # Pour les lignes
+        if row != i and grille[row][j] == valeur and grille_de_depart[i][j] == 0:
+            jeu.create_rectangle(55*j, 55*row, 55*(j+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+            jeu.tag_raise("Nombres")
+    bloc_i, bloc_j = 3 * (i // 3), 3 * (j // 3)
+    for row in range(bloc_i, bloc_i + 3): # Pour les blocs
+        for col in range(bloc_j, bloc_j + 3):
+            if (row != i or col != j) and grille[row][col] == valeur:
+                jeu.create_rectangle(55*col, 55*row, 55*(col+1), 55*(row+1), fill="#ffb5b5", outline="#ffb5b5", tag="conflit")
+                jeu.tag_raise("Nombres")
+    jeu.tag_raise("ligne")
+
+def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu, affichage_vie, debut_chrono, sauvegarde, grille_de_depart):
     """ Fonction qui vérifie à la fois la véracité d'une réponse et qui détecte si le joueur a résolu le modèle """
     global nb_vies, case_cliquee, liste_actions
     if reponse == grille_corrigee[i][j]: # Si le joueur a choisi le bon numéro
+        jeu.delete("conflit")
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="#cccac3", outline = "#cccac3") 
         jeu.tag_raise("ligne") # à chaque fois qu'on dessine un rectangle, il se superpose sur une des lignes, on "remonte" alors les lignes dans la priorité d'affichage (voir fonction qui dessine les lignes, on se référe aux tags)
         jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25), tag="Nombres")
@@ -333,6 +357,7 @@ def verifier_reponse(reponse, grille_corrigee, grille, modele_choisi, i, j, jeu,
         liste_actions.append([grille, i, j])
 
     if grille[i][j] == 0: # Si le joueur s'est trompé de numéro
+        montrer_conflits(i, j, reponse, grille, jeu, grille_de_depart) # Pour montrer les contraintes
         jeu.delete(case_cliquee)
         jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="red") 
         jeu.tag_raise("ligne")
