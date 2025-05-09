@@ -298,8 +298,7 @@ def cliquer_case(event, grille_de_depart, grille_corrigee, grille, jeu, modele_c
         if trouvé:
             break
     case_cliquee = jeu.create_rectangle(55*j, 55*i, 55*(j+1), 55*(i+1), fill="grey")
-    if grille[i][j] != 0:
-        jeu.create_text(28 + 55*j, 29 + 55*i,  text=str(grille_corrigee[i][j]), fill="black", font=("Arial", 25))
+    jeu.tag_raise("Nombres")
     jeu.tag_raise("ligne")
 
     Boite_nombres = Frame(modele_choisi, bg="white")
